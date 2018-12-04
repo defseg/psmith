@@ -6,7 +6,7 @@ var psentence = window.Psmith.psentence = {};
 psentence.ParserError = class ParserError extends Error {}
 
 psentence.parse = function parse(s) {
-	var tokens = Stream(s.split(' ').filter(x => x !== ''));
+	var tokens = Stream(s.replace(/g/g,'ɡ').split(' ').filter(x => x !== ''));
 	var query_stack = [];
 
 	while (!tokens.eof()) {
