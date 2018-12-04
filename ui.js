@@ -129,7 +129,6 @@ function ethnologue_link(row, indices) {
 
 function phoneme_display(row, indices) {
 	var phonemes = row[indices['phoneme']];
-	console.log(phonemes);
 
 	var el = document.createElement('span');
 
