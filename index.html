@@ -22,7 +22,7 @@
                 <div id='res'>Loading DB...</div>
                 <script type='text/javascript'>
                     var xhr = new XMLHttpRequest();
-                    xhr.open('GET', 'etc/phoible.sqlite');
+                    xhr.open('GET', 'phoible.sqlite');
                     xhr.responseType = 'arraybuffer';
                     xhr.onload = function (e) {
                         var uInt8Array = new Uint8Array(this.response);
