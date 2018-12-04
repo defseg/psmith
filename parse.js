@@ -107,7 +107,7 @@ function parse_qualificand(s) {
 	var s_split = s.split(';');
 	for (let section_key in s_split) {
 		let section = s_split[section_key];
-		let feature_vals = section.match(/[+-]+/)[0];
+		let feature_vals = section.replace(',','').match(/[+-]+/)[0];
 		feature_vals = feature_vals.split('').join(',');
 		let feature = section.match(/[a-z_]+/)[0];
 		term[feature] = feature_vals;
