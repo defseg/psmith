@@ -27,12 +27,13 @@ psherlock.search = function (qtree) {
 }
 
 psherlock.get_inventory = function (id) {
-    return `
-        SELECT phonemes.phoneme
+    return db.exec(`
+        SELECT segments.*
         FROM languages 
         JOIN language_phonemes ON languages.id = language_phonemes.language_id
         JOIN phonemes ON language_phonemes.phoneme_id = phonemes.id
-        WHERE languages.id = ${id};`
+        JOIN segments ON phonemes.phoneme = segments.segment
+        WHERE languages.id = ${id};`);
 }
 
 // -------------

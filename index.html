@@ -7,6 +7,7 @@
     <script src='search.js'></script>
     <script src='parse.js'></script>
     <script src='ui.js'></script>
+    <script src='messagebus.js'></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <style type='text/css'>
         body {
@@ -26,15 +27,12 @@
                     xhr.responseType = 'arraybuffer';
                     xhr.onload = function (e) {
                         var uInt8Array = new Uint8Array(this.response);
-                        db = new SQL.Database(uInt8Array);
+                        window.db = new SQL.Database(uInt8Array);
                         window.psui = new Psmith.UI(db);
                     }
                    xhr.send();
                 </script>
             </section>
-            <!-- <section id='detail' class='col-sm'>
-                Phonemes go here.
-            </section> -->
             <section id='help' class='col-sm'>
                 <h3>About</h3>
 

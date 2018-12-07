@@ -7,9 +7,15 @@ var UI = window.Psmith.UI = function () {
     this.go_el = document.getElementById('go');
     this.res_el = document.getElementById('res');
     this.res_el.innerHTML = '';
-    this.detail_el = document.getElementById('detail');
 
-    this.go_el.onclick = this.search.bind(this);
+    // init message pubs
+    this.go_el.onclick = () => {window.Psmith.bus.publish('search', {'term': this.in_el.value})};
+
+    // init message subs
+    window.Psmith.bus.subscribe('search', function (d) {
+    	var query = d.term;
+    	this.search(query);
+    }.bind(this))
 
     // if you hit enter, interpret that as a button click
     this.in_el.addEventListener('keyup', function (event) {
@@ -19,8 +25,7 @@ var UI = window.Psmith.UI = function () {
     }.bind(this));
 }
 
-UI.prototype.search = function () {
-	var query = this.in_el.value;
+UI.prototype.search = function (query) {
 	//try {
 	    var results = Psmith.psherlock.search(Psmith.psentence.parse(query));
 	//} catch (error) {
@@ -49,14 +54,6 @@ UI.prototype.search = function () {
 
 	this.res_el.innerHTML = '';
 	this.res_el.appendChild(res_contents)
-}
-
-function detail () {
-	var id = this.getAttribute('data-id');
-	var results = db.exec(Psmith.psherlock.get_inventory(id));
-	var indices = build_indices(results[0]);
-	var inventory = results[0].values;
-	phoneme_view(inventory, indices);
 }
 
 function munge_results(results, indices) {
@@ -147,6 +144,14 @@ function build_indices(results) {
 // ------------------
 // -- phoneme view --
 // ------------------
+
+function detail () {
+	var id = this.getAttribute('data-id');
+	var results = Psmith.psherlock.get_inventory(id);
+	var indices = build_indices(results[0]);
+	var inventory = results[0].values;
+	phoneme_view(inventory, indices);
+}
 
 function phoneme_view(inventory, indices) {
 
