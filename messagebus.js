@@ -21,8 +21,9 @@
 	}
 
 	window.Psmith.bus = new MessageBus([
-		'search'
-	,	'search_results'
+		'search'          // defines 'term'
+	,	'search_results'  // defines 'res'
+	,	'search_error'    // defines 'error'
 	,	'detail'
 	,	'detail_results'
 	]);

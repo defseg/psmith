@@ -12,9 +12,11 @@ var UI = window.Psmith.UI = function () {
     this.go_el.onclick = () => {window.Psmith.bus.publish('search', {'term': this.in_el.value})};
 
     // init message subs
-    window.Psmith.bus.subscribe('search', function (d) {
-    	var query = d.term;
-    	this.search(query);
+    window.Psmith.bus.subscribe('search_results', function (msg) {
+    	this.display_search_results(msg);
+    }.bind(this))
+    window.Psmith.bus.subscribe('search_error', function (msg) {
+    	this.display_error_or_no_results(msg);
     }.bind(this))
 
     // if you hit enter, interpret that as a button click
@@ -25,21 +27,15 @@ var UI = window.Psmith.UI = function () {
     }.bind(this));
 }
 
-UI.prototype.search = function (query) {
-	//try {
-	    var results = Psmith.psherlock.search(Psmith.psentence.parse(query));
-	//} catch (error) {
-	//    this.res_el.innerHTML = error;
-	//    return;
-	// }
+UI.prototype.display_error_or_no_results = function (msg) {
+	this.res_el.innerHTML = msg.error;
+	console.error(msg.error);
+}
 
-	try {
-	    var values = results[0].values;
-	} catch (error) {
-	    this.res_el.innerHTML = 'No results'
-	    return;
-	}
+UI.prototype.display_search_results = function (msg) {
+	var results = msg.res;
 
+	var values = results[0].values;
 	var indices = build_indices(results[0]);
 
 	// later on, this will be taken care of in the backend. TODO
