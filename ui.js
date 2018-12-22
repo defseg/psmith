@@ -2,7 +2,6 @@
 if (typeof window.Psmith === 'undefined') window.Psmith = {};
 
 var UI = window.Psmith.UI = function () {
-	this.db = db;
     this.in_el = document.getElementById('in');
     this.go_el = document.getElementById('go');
     this.res_el = document.getElementById('res');
