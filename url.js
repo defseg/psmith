@@ -20,8 +20,7 @@
 		var hash = window.location.hash;
 		if (hash === '') return null;
 		hash = hash.slice(1, window.location.hash.length); // discard initial #
-		hash = decodeURIComponent(hash);
-		hash = hash.split('&');
+		hash = hash.split('%26'); // &
 
 		var res = {};
 		for (let el of hash) {
