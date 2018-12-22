@@ -12,12 +12,10 @@ var UI = window.Psmith.UI = function () {
     this.go_el.onclick = () => {window.Psmith.bus.publish('search', {'term': this.in_el.value})};
 
     // init message subs
-    window.Psmith.bus.subscribe('search_results', function (msg) {
-    	this.display_search_results(msg);
-    }.bind(this))
-    window.Psmith.bus.subscribe('search_error', function (msg) {
-    	this.display_error_or_no_results(msg);
-    }.bind(this))
+    window.Psmith.bus.subscribe('search_results', this.display_search_results.bind(this));
+    window.Psmith.bus.subscribe('search_error', this.display_error_or_no_results.bind(this));
+
+    window.Psmith.url.init_url_handler();
 
     // if you hit enter, interpret that as a button click
     this.in_el.addEventListener('keyup', function (event) {
