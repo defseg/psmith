@@ -16,13 +16,24 @@
         body {
             margin-top: 20px;
         }
+        #in {
+            float: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #input-wrapper {
+            margin-right: 100px;
+        }
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='row'>
             <section id='search' class='col-sm'>
-                <input id='in' type='text' autofocus /><button id='go'>Search</button>
+                <div id='input-wrapper'>
+                    <input id='in' type='text' autofocus />
+                </div><button id='go'>Search</button>
+                
                 <div id='res'>Loading DB...</div>
                 <script type='text/javascript'>
                     // populate the search bar if linking directly to a query
