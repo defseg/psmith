@@ -4,707 +4,996 @@ if (typeof window.Psmith.psegmentizer === 'undefined') window.Psmith.psegmentize
 
 var features = window.Psmith.psegmentizer.features = {};
 
-// Cache metadata objects, because we'll store them in a set later.
-// If we make them on the fly with no caching, there could be two different 
-// objects with the same properties.
-// Have to hoist this so f() doesn't get confused.
-var metas = {};
-
-features.unknown = f('unknown', 100, {})
-
-// TODO: This whole thing should be rewritten.
-// Define feature metadata first and only once,
-// then associate binary feature bundles with the feature metadata.
-// That way nothing is duplicated and the code will look nicer -
-// - since feature metadata lines won't be broken up by feature bundles.
-// Also it'll mean the ugly caching stuff won't be needed anymore.
+features.unknown = {
+    meta: {
+        order: 99999
+    }, features: [{'syllabic': 'you should never see this'}]
+}
 
 features.place_and_secondary_articulation = [
-    f('labial', 0, {
-        'labial':      '+'
-    ,   'round':       '-'
-    ,   'labiodental': '-'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '-'
-    }),   
-    f('palatalized labial', 1, {
-        'labial':      '+'
-    ,   'round':       '-'
-    ,   'labiodental': '-'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+' 
-    }),
-    f('rounded labial', 2, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '-'
-    }),
-    f('labiodental', 3, {
-        'round':       '-'
-    ,   'labiodental': '+'
-    }),     
-    f('rounded labiodental', 4, {
-        'round':       '+'
-    ,   'labiodental': '+'
-    }),     
-    f('dental', 5, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '-'
-    }),     
-    f('rounded dental', 6, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '-'    
-    }),     
-    f('palatalized dental', 7, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }),     
-    f('velarized dental', 8, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '-'
-    ,   'back':        '-'
-    }),     
-    f('alveolar', 9, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '-'
-    ,   'dorsal':      '-'
-    }),     
-    f('rounded alveolar', 10, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '-'
-    ,   'dorsal':      '-'
-    }),
-    f('palatalized alveolar', 11, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '-'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }),     
-    f('rounded palatalized alveolar', 12, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '-'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }),     
-    f('velarized alveolar', 13, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '-'
-    ,   'dorsal':      '+'
-    ,   'front':       '-'
-    ,   'back':        '+'
-    }),     
-    f('retroflex', 14, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '-'
-    ,   'dorsal':      '-'
-    }),     
-    f('rounded retroflex', 15, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '-'
-    ,   'dorsal':      '-'
-    }),     
-    f('palatalized retroflex', 16, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '-'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }), // no velarized or labiopalatalized retroflexes in PHOIBLE?
-    f('alveolopalatal', 17, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '-'
-    }),     
-    f('rounded alveolopalatal', 18, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '-'
-    }),     
-    f('palatalized alveolopalatal', 19, { // what?
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }),     
-    f('velarized alveolopalatal', 20, { // really?
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '-'
-    ,   'back':        '+'
-    }),     
-    f('palatoalveolar', 21, { // only diff btwn these and palatalized dentals is these are -back. yeah, sure.
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '-'
-    }),     
-    f('rounded palatoalveolar', 22, { // and rounding makes palatoalveolars stop being +dorsal...
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '-'
-    }),     
-    f('rounded palatoalveolar', 23, { // ...except for tɕʷ! what in tarnation?!
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '-'
-    }),     
-    f('rounded palatalized palatoalveolar', 24, { // %@*$%*$@#!!!! pray there are no labiopalatalized dentals?
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }),     
-    f('palatal', 25, {
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '+'
-    ,   'back':        '-'
-    }),     
-    f('rounded palatal', 26, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '+'
-    ,   'back':        '-'
-    }),     
-    f('sje', 27, { // IPA sure does make good decisions!! this is basically a rounded dorsal, lbr. TODO?
-        'labial':      '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '-'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '-'
-    ,   'back':        '+'
-    }),     
-    f('velar', 28, { // ɰ is also special-cased. TODO maybe move all this %#@^$% to errata
-        'labial':      '-'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '-'
-    ,   'back':        '+'
-    }),     
-    f('rounded velar', 29, { // this is w˞   it is also exceedingly silly. TODO
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '+'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '-'
-    ,   'back':        '+'
-    }),     
-    f('prevelar', 30, { // what? do these contrast with palatals? TODO
-        'labial':      '-'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '+'
-    ,   'back':        '-'
-    }),     
-    f('velar', 31, {
-        'labial':      '-'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '-'
-    ,   'back':        '-'
-    }),     
-    f('rounded velar', 32, {
-        'labial':      '+'
-    ,   'round':       '+'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '-'
-    ,   'back':        '-'
-    }),     
-    f('rounded velar', 32, { // w
-    	'labial': 	   '+'
-    ,	'round':       '+'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,	'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '-'
-    ,   'back':        '+'
-    }),
-    f('palatalized velar', 33, { 
-        'labial':      '-'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '+'
-    ,   'low':         '-'
-    ,   'front':       '+'
-    ,   'back':        '+'
-    }),     
-    f('labial-alveolar', 34, {
-        'labial':      '+'
-    ,   'round':       '-'
-    ,   'labiodental': '-'
-    ,   'coronal':     '+'
-    ,   'anterior':    '+'
-    ,   'distributed': '-'
-    ,   'dorsal':      '+'
-    }),     
-    f('labial-velar', 35, {
-        'labial':      '+'
-    ,   'coronal':     '-'
-    ,   'dorsal':      '+'
-    ,   'round':       '-'
-    }),     
-    f('uvular', 36, { // NB: no palatalized uvulars - Ubykh isn't in PHOIBLE
-        'labial':       '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '-'
-    ,   'low':         '-'
-    }),     
-    f('rounded uvular', 37, {
-    	'labial':      '+'
-    ,   'round':       '+'
-    ,   'dorsal':      '+'
-    ,   'high':        '-'
-    ,   'low':         '-'
-    }),     
-    f('pharyngeal', 38, {
-        'labial':      '-'
-    ,   'dorsal':      '+'
-    ,   'high':        '-'
-    ,   'low':         '+'
-    }),     
-    f('rounded pharyngeal', 39, {
-    	'labial':      '+'
-    ,   'round':       '+'
-    ,   'dorsal':      '+'
-    ,   'high':        '-'
-    ,   'low':         '+'
-    }),
-    f('glottal', 40, { 
-    	// no features - we get this with string processing
-    	// but we need a fake one
-    	'round': 'mu'
-    })
-];
+    {
+        meta: {
+            name: 'labial',
+            order: 0
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '-'
+        ,   'labiodental': '-'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized labial',
+            order: 1
+        }, features: [{
+                'labial':      '+'
+            ,   'round':       '-'
+            ,   'labiodental': '-'
+            ,   'dorsal':      '+'
+            ,   'front':       '+'
+            ,   'back':        '+' 
+            }]
+    }, {
+        meta: {
+            name: 'rounded labial',
+            order: 2
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'labiodental',
+            order: 3
+        }, features: [{
+            'round':       '-'
+        ,   'labiodental': '+'
+        }]
+    }, {
+        meta: {
+            name: 'rounded labiodental',
+            order: 4
+        }, features: [{
+            'round':       '+'
+        ,   'labiodental': '+'
+        }]
+    }, {
+        meta: {
+            name: 'dental',
+            order: 5
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded dental',
+            order: 6
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '-'    
+        }]
+    }, {
+        meta: {
+            name: 'palatalized dental',
+            order: 7
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'velarized dental',
+            order: 8
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '-'
+        ,   'back':        '-'
+        }]
+    }, {
+        meta: {
+            name: 'alveolar',
+            order: 9
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '-'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded alveolar',
+            order: 10
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '-'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized alveolar',
+            order: 11
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '-'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'rounded palatalized alveolar',
+            order: 12
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '-'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'velarized alveolar',
+            order: 13
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '-'
+        ,   'dorsal':      '+'
+        ,   'front':       '-'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'retroflex',
+            order: 14
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '-'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded retroflex',
+            order: 15
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '-'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized retroflex',
+            order: 16
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '-'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }] // no velarized or labiopalatalized retroflexes in PHOIBLE?
+    }, {
+        meta: {
+            name: 'alveolopalatal',
+            order: 17
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded alveolopalatal',
+            order: 18
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized alveolopalatal',
+            order: 19
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    },  {
+        meta: {
+            name: 'velarized alveolopalatal',
+            order: 20
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '-'
+        ,   'back':        '+'
+        }]
+    },  {
+        meta: {
+            name: 'palatoalveolar',
+            order: 21
+        }, features: [{ // only diff btwn these and palatalized dentals is these are -back. yeah, sure.
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '-'
+        }]
+    },  {
+        meta: {
+            name: 'rounded palatoalveolar',
+            order: 22
+        }, features: [{ // and rounding makes palatoalveolars stop being +dorsal...
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '-'
+        }, { // ...except for tɕʷ! what in tarnation?!
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded palatalized palatoalveolar',
+            order: 24,
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'palatal',
+            order: 25
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '-'
+        }, { // These used to be "prevelars". /j/ and some bizarre SPA segments.
+             // k̟ʰ k̟ ŋɡ̟ appear in five languages: Ket, Hakka, Irish Gaelic, French, and Lithuanian.
+             // In Ket, Hakka, and French, these should be velars. In Irish and Lithuanian, palatals.
+             // French will display as having no velars but /N/, but that's on them, not me.
+             // There's also EWONDO (UPSID) i͓ if you search under +consonantal, 
+             // but that's a fricated vowel, I think.
+            'labial':      '-' 
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded palatal',
+            order: 26
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '-'
+        }]
+    }, { // The IPA made some very good decisions and now I have to put up with this.
+        meta: {
+            name: 'sje',
+            order: 28
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '-'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '-'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'velar',
+            order: 29
+        }, features: [{
+            'labial':      '-' // all velars except ɰ
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '-'
+        ,   'back':        '-'
+        }, { 
+            'labial':      '-' // ɰ
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '-'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'rounded velar',
+            order: 32
+        }, features: [{
+            'labial':      '+' // most rounded velars
+        ,   'round':       '+'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '-'
+        ,   'back':        '-'
+        }, {
+            'labial':      '+' // w
+        ,   'round':       '+'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '-'
+        ,   'back':        '+'
+        }, {
+            'labial':      '+' // w˞ 
+        ,   'round':       '+'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '+'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '-'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized velar',
+            order: 33,
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'labial-alveolar',
+            order: 34
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '-'
+        ,   'labiodental': '-'
+        ,   'coronal':     '+'
+        ,   'anterior':    '+'
+        ,   'distributed': '-'
+        ,   'dorsal':      '+'
+        }]
+    }, { // labial-uvulars are AFAIK completely unattested
+        meta: {
+            name: 'labial-velar',
+            order: 35
+        }, features: [{
+            'labial':      '+'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'round':       '-'
+        }]
+    }, {
+        meta: {
+            name: 'uvular',
+            order: 36
+        }, features: [{
+            'labial':      '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '-'
+        ,   'low':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'rounded uvular',
+            order: 37
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'dorsal':      '+'
+        ,   'high':        '-'
+        ,   'low':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'pharyngeal',
+            order: 38
+        }, features: [{
+            'labial':      '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '-'
+        ,   'low':         '+'
+        }]
+    }, {
+        meta: {
+            name: 'rounded pharyngeal',
+            order: 39
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'dorsal':      '+'
+        ,   'high':        '-'
+        ,   'low':         '+'
+        }]
+    }, {
+        meta: {
+            name: 'glottal',
+            order: 40,
+        }, features: [{ // No features - we get this with string processing, for reasons I forget.
+            'round': 'mu' // But we need a fake one.
+        }]
+    }
+],
 
 features.pharyngeal_configuration = [
-    f('plain',          0, {'advanced_tongue_root': '-', 'retracted_tongue_root': '-'}),
-    f('pharyngealized', 1, {'advanced_tongue_root': '-', 'retracted_tongue_root': '+'}),
-    f('ATR'           , 2, {'advanced_tongue_root': '+', 'retracted_tongue_root': '-'})
+    {
+        meta: {
+            name: 'plain',
+            order: 0
+        }, features: [{
+            'advanced_tongue_root': '-', 
+            'retracted_tongue_root': '-'
+        }]
+    }, {
+        meta: {
+            name: 'pharyngealized',
+            order: 1
+        }, features: [{
+            'advanced_tongue_root': '-', 
+            'retracted_tongue_root': '+'
+        }]
+    }, {
+        meta: {
+            name: 'ATR',
+            order: 2
+        }, features: [{
+            'advanced_tongue_root': '+',
+            'retracted_tongue_root': '-'
+        }]
+    }
 ];
 
 features.manner = [ // TODO: fix prenasalized consonants
-    f('plosive', 0, {
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '-'
-    ,   'delayed_release': '-'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('nasalized plosive', 1, { // actually nasality-conditioning, I think
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '-'
-    ,   'delayed_release': '-'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('affricate', 2, {
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '-'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('nasalized affricate', 3, { // actually nasality-conditioning again
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '-'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('fricative', 4, {
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '+'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('nasalized fricative', 5, {
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '+'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('nasal', 6, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '-'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('resonant', 7, {
-        'consonantal':     '-'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('nasalized resonant', 8, {
-        'consonantal':     '-'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('tap', 9, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '+'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('nasalized tap', 10, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '+'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('fricated tap', 11, { // ɾ͓
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '+'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '+'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('trill', 12, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '+'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('nasalized trill', 13, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '+'
-    ,   'nasal':           '+'
-    ,   'lateral':         '-'
-    }),
-    f('fricated trill', 14, { // r͓̪ - what? looks like this is UPSID =rF
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '+'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('resonant', 7, { // r\`
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('resonant', 7, { // W
-        'consonantal':     '-'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '+'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '-'
-    }),
-    f('lateral resonant', 7.5, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '+'
-    }),
-    f('nasalized lateral resonant', 7.7, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+'
-    ,   'lateral':         '+'
-    }),
-    f('lateral fricative', 4.5, {
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '+'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '+'
-    }),
-    f('lateral affricate', 3.5, {
-        'consonantal':     '+'
-    ,   'sonorant':        '-'
-    ,   'continuant':      '-'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '+'
-    }),
-    f('prenasalized lateral affricate', 3.7, { // n̤d̤ɮ̤
-        'consonantal':     '+'
-    ,   'sonorant':        '+,-'
-    ,   'continuant':      '-'
-    ,   'delayed_release': '+'
-    ,   'approximant':     '-'
-    ,   'tap':             '-'
-    ,   'trill':           '-'
-    ,   'nasal':           '+,-'
-    ,   'lateral':         '+'
-    }),
-    f('lateral tap', 9.5, {
-        'consonantal':     '+'
-    ,   'sonorant':        '+'
-    ,   'continuant':      '+'
-    ,   'approximant':     '+'
-    ,   'tap':             '+'
-    ,   'trill':           '-'
-    ,   'nasal':           '-'
-    ,   'lateral':         '+'
-    })
+    {
+        meta: {
+            name: 'plosive',
+            order: 0
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '-'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasality-conditioning plosive',
+            order: 1
+        }, features: [{ // PHOIBLE is wrong. These aren't nasalized. They nasalize following V.
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '-'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'affricate',
+            order: 2
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasality-conditioning affricate',
+            order: 3
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'fricative',
+            order: 4
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasalized fricative',
+            order: 5
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasal',
+            order: 6
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '-'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'resonant',
+            order: 7
+        }, features: [{
+            'consonantal':     '-'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }, {
+            'consonantal':     '+' // r\`
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }, {
+            'consonantal':     '-'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasalized resonant',
+            order: 8
+        }, features: [{
+            'consonantal':     '-'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'tap',
+            order: 9
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '+'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasalized tap',
+            order: 10
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '+'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: { 
+            name: 'fricated tap',
+            order: 11,
+        }, features: [{ // ɾ͓
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '+'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'trill',
+            order: 12
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '+'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'nasalized trill',
+            order: 13
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '+'
+        ,   'nasal':           '+'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: { 
+            name: 'fricated trill',
+            order: 14,
+        }, features: [{ // r͓̪ - what? looks like this is UPSID =rF
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '+'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }]
+    }, {
+        meta: {
+            name: 'lateral resonant',
+            order: 7.5
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '+'
+        }]
+    }, {
+        meta: {
+            name: 'nasalized lateral resonant',
+            order: 7.7
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+'
+        ,   'lateral':         '+'
+        }]
+    }, {
+        meta: {
+            name: 'lateral fricative',
+            order: 4.5
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '+'
+        }]
+    }, {
+        meta: {
+            name: 'lateral affricate',
+            order: 2.5
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '+'
+        }, { // n̤d̤ɮ̤
+            'consonantal':     '+'
+        ,   'sonorant':        '+,-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+,-'
+        ,   'lateral':         '+'
+        }]
+    }, {
+        meta: {
+            name: 'lateral tap',
+            order: 9.5
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '+'
+        ,   'continuant':      '+'
+        ,   'approximant':     '+'
+        ,   'tap':             '+'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '+'
+        }]
+    }
 ];
 
 features.voicing = [
-    f('breathy-voiced', 3, {
+    {
+        meta: {
+            name: 'breathy-voiced',
+            order: 3
+        }, features: [{
         'periodic_glottal_source': '+'
     ,   'spread_glottis':          '+'
-    }),
-    f('voiced', 2, {
-        'periodic_glottal_source': '+'
-    ,   'spread_glottis':          '-'
-    }),
-    f('aspirated', 0, {
-        'periodic_glottal_source': '-'
-    ,   'spread_glottis':          '+'
-    }),
-    f('unvoiced', 1, {
-        'periodic_glottal_source': '-'
-    ,   'spread_glottis':          '-'
-    }),
+        }]
+    }, {
+        meta: {
+            name: 'voiced',
+            order: 2
+        }, features: [{
+            'periodic_glottal_source': '+'
+        ,   'spread_glottis':          '-'
+        }]
+    }, {
+        meta: {
+            name: 'aspirated',
+            order: 0
+        }, features: [{
+            'periodic_glottal_source': '-'
+        ,   'spread_glottis':          '+'
+        }]
+    }, {
+        meta: {
+            name: 'unvoiced',
+            order: 1
+        }, features: [{
+            'periodic_glottal_source': '-'
+        ,   'spread_glottis':          '-'
+        }]
+    }
 ];
 
 features.airstream_mechanism = [
-    f('ejective', 2, {
-        'ejective': '+'
-    ,   'implosive': '-'
-    ,   'constricted_glottis': '-'
-    }),
-    f('implosive', 3, {
-        'ejective': '-'
-    ,   'implosive': '+'
-    ,   'constricted_glottis': '-'
-    }),
-    f('glottalized', 1, {
-        'ejective': '-'
-    ,   'implosive': '-'
-    ,   'constricted_glottis': '+'
-    }),
-    f('glottalized implosive', 4, { // these vary in their ejective feature but that distinction seems fake
+    {
+        meta: {
+            name: 'ejective',
+            order: 2
+        }, features: [{
+            'ejective': '+'
+        ,   'implosive': '-'
+        ,   'constricted_glottis': '-'
+        }]
+    }, {
+        meta: {
+            name: 'implosive',
+            order: 3
+        }, features: [{
+            'ejective': '-'
+        ,   'implosive': '+'
+        ,   'constricted_glottis': '-'
+        }]
+    }, {
+        meta: {
+            name: 'glottalized',
+            order: 1
+        }, features: [{
+            'ejective': '-'
+        ,   'implosive': '-'
+        ,   'constricted_glottis': '+'
+        }]
+    }, {
+        meta: {
+            name: 'glottalized implosive',
+            order: 4,
+        }, features: [{ // these vary in their ejective feature but that distinction seems fake
         'implosive': '+'
     ,   'constricted_glottis': '+'
-    }),
-    f('modal', 0, {
-        'ejective': '-'
-    ,   'implosive': '-'
-    ,   'constricted_glottis': '-'
-    })
-];
+        }]
+    }, {
+        meta: {
+            name: 'modal',
+            order: 0
+        }, features: [{
+            'ejective': '-'
+        ,   'implosive': '-'
+        ,   'constricted_glottis': '-'
+        }]
+    }
+]
 
 features.duration = [
-    f('normal', 1, {
-        'short': '-'
-    ,   'long':  '-'
-    }),
-    f('short', 0, {
-        'short': '+'
-    ,   'long':  '-'
-    }),
-    f('half-long', 2, {
-        'short': '+'
-    ,   'long':  '+'
-    }),
-    f('long', 3, {
-        'short': '-'
-    ,   'long':  '+'
-    })
+    {
+        meta: {
+            name: 'normal',
+            order: 1
+        }, features: [{
+            'short': '-'
+        ,   'long':  '-'
+        }]
+    }, {
+        meta: {
+            name: 'short',
+            order: 0
+        }, features: [{
+            'short': '+'
+        ,   'long':  '-'
+        }]
+    }, {
+        meta: {
+            name: 'half-long',
+            order: 2
+        }, features: [{
+            'short': '+'
+        ,   'long':  '+'
+        }]
+    }, {
+        meta: {
+            name: 'long',
+            order: 3
+        }, features: [{
+            'short': '-'
+        ,   'long':  '+'
+        }]
+    }
 ];
 
 features.strength = [
-	f('normal', 0, {
-		'fortis': '-'
-	}),
-	f('fortis', 1, {
-		'fortis': '+'
-	})
-];
-
-function f(name, order, features) {
-	if (metas.hasOwnProperty(name + order)) {
-		var meta = metas[name + order];
-	} else {
-		var meta = {'name': name, 'order': order};
-		metas[name + order] = meta;
-	}
-    return {
-    	'meta': meta
-    ,	'features': features
-	}
-}
+    {
+        meta: {
+            name: 'normal',
+            order: 0
+        }, features: [{
+            'fortis': '-'
+        }]
+    }, {
+        meta: {
+            name: 'fortis',
+            order: 1
+        }, features: [{
+            'fortis': '+'
+        }]
+    }
+]
 
 })();

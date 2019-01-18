@@ -20,8 +20,6 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
         }
     });
 
-    console.log(consonants);
-
     return {
         'consonants': build_grid(consonants)
     }
@@ -80,6 +78,9 @@ PhonemeMatrix.prototype.count_y = function (y) {
 PhonemeMatrix.prototype.count_x = function (x) {
     // Return the number of distinct phonemes in a chart column.
     return [...this.map.entries()].reduce((acc, cur) => acc + cur[1].get(x).length, 0)
+}
+PhonemeMatrix.prototype.merge_columns = function (merge_from, merge_into) {
+
 }
 
 PhonemeMatrix.prototype.to_html = function () {
@@ -181,6 +182,7 @@ function get_place_and_secondary_articulation(segment) {
     if (seg === 'nɡ') return get_by_name('place_and_secondary_articulation', 'velar');
     if (seg === 'nɟ') return get_by_name('place_and_secondary_articulation', 'palatal');
     if (seg === 'ndzʲ') return get_by_name('place_and_secondary_articulation', 'palatalized alveolar'); // should be +back but isn't
+    if (seg === 'ɹ' || seg === 'ɹ' || seg === 'ɹˤ' || seg === 'ɹ̰ˤ' || seg === 'ɹ̝') return get_by_name('place_and_secondary_articulation', 'alveolar') // given as alveolopalatal
 
     return get('place_and_secondary_articulation', segment)
 }
@@ -197,11 +199,16 @@ function get_by_name(form, name) {
 }
 
 function test(segment, foo_oa) {
-    return Object.keys(foo_oa.features).every(x => {
-        return !(segment[x] === undefined) &&
-               !(segment[x] === null) &&
-               segment[x].indexOf(foo_oa.features[x]) === 0; // NB: compares the *beginning*
-    });                                                      // beware time-variant features!
+    // Compares the beginning - beware time-variant features.
+    for (let feature_bundle of foo_oa.features) {
+        var matches = Object.keys(feature_bundle).every(function (x) {
+            return !(segment[x] === undefined) && !(segment[x] === null) &&
+                    segment[x].indexOf(feature_bundle[x]) === 0;
+        });
+        if (matches) return true;
+    }
+    return false;
 }
 
+// TODO: unknown doesn't work
 })();
