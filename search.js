@@ -33,7 +33,7 @@ psherlock.get_inventory = function (id) {
         JOIN language_phonemes ON languages.id = language_phonemes.language_id
         JOIN phonemes ON language_phonemes.phoneme_id = phonemes.id
         JOIN segments ON phonemes.phoneme = segments.segment
-        WHERE languages.id = ${id};`);
+        WHERE languages.id = ${id};`)[0];
 }
 
 // -------------
