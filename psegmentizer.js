@@ -133,7 +133,7 @@ function build_indices(results) {
 function segment_info(segment) {
     // vowels
     if (segment.syllabic !== '-' && segment.consonantal === '-') return vowel_info(segment);
-    if (segment.syllabic.indexOf(',') > -1) return vowel_info(segment); // aj, aw etc. - erroneous diphthongs
+    if (segment.syllabic && segment.syllabic.indexOf(',') > -1) return vowel_info(segment); // aj, aw etc. - erroneous diphthongs
 
     // tones
     if (segment.tone === '+') return tone_info(segment);
