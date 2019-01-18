@@ -20,12 +20,18 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
             consonants.push(x)
         } else if (x && x.klass === 'click') {
             clicks.push(x)
+        } else if (x && x.klass === 'vowel') {
+            vowels.push(x)
+        } else if (x && x.klass === 'tone') {
+            tones.push(x);
         }
     });
 
     return {
         'consonants': build_grid(consonants),
-        'clicks': build_grid(clicks)
+        'clicks': build_grid(clicks),
+        'vowels': new PhonemeArray(vowels), // TODO make a nice grid for these too
+        'tones': new PhonemeArray(tones)
     }
 }
 
@@ -108,6 +114,15 @@ PhonemeMatrix.prototype.to_html = function () {
     return res;
 }
 
+// We want tones to also have a to_html, so we'll make a one-dimensional array too. TODO test this
+function PhonemeArray (phonemes) {
+    this.phonemes = phonemes;
+}
+PhonemeArray.prototype.to_html = function () {
+    return `<span>${this.phonemes.join(' ')}</span>`
+}
+
+
 function get_y_x(phoneme) {
     if (phoneme.klass === 'consonant' || phoneme.klass === 'click') return [phoneme.manner, phoneme.place];
     throw new Error('TODO: get_x_y for vowels');
@@ -150,15 +165,22 @@ function segment_info(segment) {
 }
 
 function vowel_info(segment) {
-
+    // TODO
+    return {
+        phoneme: segment.segment
+    ,   klass: 'vowel'
+    }
 }
 
 function tone_info(segment) {
-
+    // TODO?
+    return {
+        phoneme: segment.segment
+    ,   klass: 'tone'
+    }
 }
 
 function consonant_info(segment, is_click = false) {
-
     return {
         phoneme: segment.segment
     ,   klass: is_click ? 'click' : 'consonant'
