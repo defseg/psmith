@@ -553,11 +553,11 @@ features.manner = [ // TODO: fix prenasalized consonants
         }]
     }, {
         meta: {
-            name: 'nasality-conditioning plosive',
+            name: 'nasalized plosive',
             order: 1
         }, features: [{ // PHOIBLE is wrong. These aren't nasalized. They nasalize following V.
-            'consonantal':     '+'
-        ,   'sonorant':        '-'
+            'consonantal':     '+' // Except for the nasalized clicks, which are nasalized.
+        ,   'sonorant':        '-' // TODO: separate grid for clicks
         ,   'continuant':      '-'
         ,   'delayed_release': '-'
         ,   'approximant':     '-'
@@ -583,7 +583,7 @@ features.manner = [ // TODO: fix prenasalized consonants
         }]
     }, {
         meta: {
-            name: 'nasality-conditioning affricate',
+            name: 'nasalized affricate',
             order: 3
         }, features: [{
             'consonantal':     '+'
