@@ -348,6 +348,15 @@ features.place_and_secondary_articulation = [
         ,   'low':         '-'
         ,   'front':       '+'
         ,   'back':        '-'
+        }, { // ɥ
+            'labial':      '+'
+        ,   'round':       '+'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '-'
         }]
     }, { // The IPA made some very good decisions and now I have to put up with this.
         meta: {
