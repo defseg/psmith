@@ -188,6 +188,8 @@ function get_place_and_secondary_articulation(segment) {
     if (seg === 'nɟ') return get_by_name('place_and_secondary_articulation', 'palatal');
     if (seg === 'ndzʲ') return get_by_name('place_and_secondary_articulation', 'palatalized alveolar'); // should be +back but isn't
     if (seg === 'ɹ' || seg === 'ɹ' || seg === 'ɹˤ' || seg === 'ɹ̰ˤ' || seg === 'ɹ̝') return get_by_name('place_and_secondary_articulation', 'alveolar') // given as alveolopalatal
+    if (seg === 'ŋmkpɾ') return get_by_name('place_and_secondary_articulation', 'labial-velar');
+    if (seg === 'nɡɾ') return get_by_name('place_and_secondary_articulation', 'velar');
 
     return get('place_and_secondary_articulation', segment)
 }
