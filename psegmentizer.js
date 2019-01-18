@@ -10,6 +10,7 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
     var mapped = segments.map(x => segment_info(x));
 
     var consonants = [];
+    var clicks = []; // Yes, these are consonants, but they need a separate table. Like lanthanides and actinides.
     var vowels = [];
     var tones = [];
     var unknowns = [];
@@ -17,11 +18,14 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
     mapped.forEach(x => {
         if (x && x.klass === 'consonant') {
             consonants.push(x)
+        } else if (x && x.klass === 'click') {
+            clicks.push(x)
         }
     });
 
     return {
-        'consonants': build_grid(consonants)
+        'consonants': build_grid(consonants),
+        'clicks': build_grid(clicks)
     }
 }
 
@@ -80,7 +84,7 @@ PhonemeMatrix.prototype.count_x = function (x) {
     return [...this.map.entries()].reduce((acc, cur) => acc + cur[1].get(x).length, 0)
 }
 PhonemeMatrix.prototype.merge_columns = function (merge_from, merge_into) {
-
+    // TODO
 }
 
 PhonemeMatrix.prototype.to_html = function () {
@@ -105,7 +109,7 @@ PhonemeMatrix.prototype.to_html = function () {
 }
 
 function get_y_x(phoneme) {
-    if (phoneme.klass === 'consonant') return [phoneme.manner, phoneme.place];
+    if (phoneme.klass === 'consonant' || phoneme.klass === 'click') return [phoneme.manner, phoneme.place];
     throw new Error('TODO: get_x_y for vowels');
 }
 
@@ -138,6 +142,9 @@ function segment_info(segment) {
     // tones
     if (segment.tone === '+') return tone_info(segment);
 
+    // click consonants
+    if (segment.click === '+') return consonant_info(segment, true);
+
     // if it's not a vowel or a tone, it's a consonant
     return consonant_info(segment);
 }
@@ -150,14 +157,12 @@ function tone_info(segment) {
 
 }
 
-function consonant_info(segment) {
-    var place_and_secondary_articulation = get_place_and_secondary_articulation(segment);
+function consonant_info(segment, is_click = false) {
 
     return {
         phoneme: segment.segment
-    ,   klass: 'consonant'
-    ,   place: place_and_secondary_articulation
-    //,   secondary_articulation: place_and_secondary_articulation[1]
+    ,   klass: is_click ? 'click' : 'consonant'
+    ,   place: get_place_and_secondary_articulation(segment)
     ,   pharyngeal_configuration: get('pharyngeal_configuration', segment)
     ,   manner: get('manner', segment)
     ,   voicing: get('voicing', segment)

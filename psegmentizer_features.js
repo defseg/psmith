@@ -6,6 +6,7 @@ var features = window.Psmith.psegmentizer.features = {};
 
 features.unknown = {
     meta: {
+        name: 'undefined', // eh, why not
         order: 99999
     }, features: [{'syllabic': 'you should never see this'}]
 }
@@ -559,6 +560,16 @@ features.manner = [ // TODO: fix prenasalized consonants
         ,   'trill':           '-'
         ,   'nasal':           '-'
         ,   'lateral':         '-'
+        }, { // Prenasalized stops
+            'consonantal':     '+'
+        ,   'sonorant':        '+,-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '-'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+,-'
+        ,   'lateral':         '-'
         }]
     }, {
         meta: {
@@ -589,6 +600,16 @@ features.manner = [ // TODO: fix prenasalized consonants
         ,   'trill':           '-'
         ,   'nasal':           '-'
         ,   'lateral':         '-'
+        }, { // prenasalized affricates
+            'consonantal':     '+'
+        ,   'sonorant':        '+,-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+,-'
+        ,   'lateral':         '-'
         }]
     }, {
         meta: {
@@ -613,6 +634,16 @@ features.manner = [ // TODO: fix prenasalized consonants
             'consonantal':     '+'
         ,   'sonorant':        '-'
         ,   'continuant':      '+'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-'
+        }, { // prenasalized fricatives
+            'consonantal':     '+'
+        ,   'sonorant':        '+,-'
+        ,   'continuant':      '-,+'
         ,   'delayed_release': '+'
         ,   'approximant':     '-'
         ,   'tap':             '-'
@@ -1004,5 +1035,7 @@ features.strength = [
         }]
     }
 ]
+
+// TODO: prenasalization should go in here somewhere
 
 })();
