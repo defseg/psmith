@@ -1,11 +1,14 @@
 (function () {
 if (typeof window.Psmith === 'undefined') window.Psmith = {};
 
-var UI = window.Psmith.UI = function () {
+var UI = window.Psmith.UI = function (navbar) {
     this.in_el = document.getElementById('in');
     this.go_el = document.getElementById('go');
     this.res_el = document.getElementById('res');
     this.res_el.innerHTML = '';
+
+    // init navbar
+    this.navbar = new Psmith.Navbar();
 
     // init message pubs
     this.go_el.onclick = () => {window.Psmith.bus.publish('search', {'term': this.in_el.value})};
@@ -70,7 +73,7 @@ function munge_results(results, indices) {
 
 function language_template(row, indices) {
 	var language_el = document.createElement('tr');
-	var columns = [phoible_link, ethnologue_link, phoneme_display];
+	var columns = [detail_link, ethnologue_link, phoneme_display];
 	columns.forEach(f => {
 		var td = document.createElement('td');
 		td.appendChild(f(row, indices));
@@ -139,37 +142,11 @@ function build_indices(results) {
 // ------------------
 
 function detail () {
+	console.log('asdfsafd')
 	var id = this.getAttribute('data-id');
-	var results = Psmith.psherlock.get_inventory(id);
-	var indices = build_indices(results[0]);
-	var inventory = results[0].values;
-	phoneme_view(inventory, indices);
+	var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(id));
+	window.Psmith.bus.publish('detail_results', {res: results});
 }
-
-function phoneme_view(inventory, indices) {
-
-}
-
-function place_of_articulation(row, indices) {
-
-}
-
-function method_of_articulation(row, indices) {
-
-}
-
-function secondary_articulation(row, indices) {
-
-}
-
-function phonation(row) {
-
-}
-
-// ----------------------------------------------
-// -- PHOIBLE feature to POA, MOA etc. mappers --
-// ----------------------------------------------
-
 
 
 })();

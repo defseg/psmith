@@ -13,6 +13,7 @@
     <script src='url.js'></script>
     <script src='psegmentizer.js'></script>
     <script src='psegmentizer_features.js'></script>
+    <script src='navbar.js'></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <style type='text/css'>
         body {
@@ -26,6 +27,16 @@
         #input-wrapper {
             margin-right: 100px;
         }
+        #detail-container {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            overflow: scroll;
+        }
+        .hidden {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -154,5 +165,13 @@
             </section>
         </div>
     </div>
+    <section id='detail-container'>
+        <a id='detail-pre' href='#'>
+            ^
+        </a>
+        <div id='detail' class='hidden'>
+            Detail goes here, toot toot.
+        </div>
+    </section>
 </body>
 </html>

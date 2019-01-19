@@ -25,6 +25,6 @@
 	,	'search_results'  // defines 'res'
 	,	'search_error'    // defines 'error'
 	,	'detail'
-	,	'detail_results'
+	,	'detail_results'  // defines 'res'
 	]);
 })();
