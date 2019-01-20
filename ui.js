@@ -17,6 +17,12 @@ var UI = window.Psmith.UI = function () {
     window.Psmith.bus.subscribe('search_results', this.display_search_results.bind(this));
     window.Psmith.bus.subscribe('search_error', this.display_error_or_no_results.bind(this));
 
+    // Not sure where else to put this. TODO? Probably shouldn't be here.
+    window.Psmith.bus.subscribe('detail', function (msg) {
+    	var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(msg.term));
+		window.Psmith.bus.publish('detail_results', {res: results});
+	});
+
     window.Psmith.url.init_url_handler();
 
     // if you hit enter, interpret that as a button click
@@ -143,8 +149,7 @@ function build_indices(results) {
 
 function detail () {
 	var id = this.getAttribute('data-id');
-	var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(id));
-	window.Psmith.bus.publish('detail_results', {res: results});
+	window.Psmith.bus.publish('detail', {term: id});
 }
 
 

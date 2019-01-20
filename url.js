@@ -7,6 +7,9 @@
 		window.Psmith.bus.subscribe('search', function (event) {
 			set_hash('search', event.term)
 		});
+		window.Psmith.bus.subscribe('detail', function (event) {
+			set_hash('detail', event.term)
+		});
 
 		var hash = get_hash();
 		if (hash === null) return;
@@ -20,7 +23,7 @@
 		var hash = window.location.hash;
 		if (hash === '') return null;
 		hash = hash.slice(1, window.location.hash.length); // discard initial #
-		hash = hash.split('%26'); // &
+		hash = hash.split('&');
 
 		var res = {};
 		for (let el of hash) {
