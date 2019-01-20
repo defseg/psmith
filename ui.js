@@ -91,7 +91,7 @@ function detail_link(row, indices) {
 	// dataset is slow and has poor cross-browser performance
 	link.setAttribute('data-id', id);
 	link.textContent = name;
-	link.href = '#'; // TODO: maybe it should be possible to link straight to an inventory and/or search?
+	link.setAttribute('tabindex', '0'); // TODO: these should be real links with hrefs and all. need to get detail URL handling first tho
 
 	// bind the event
 	link.onclick = detail;
