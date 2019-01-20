@@ -1,14 +1,14 @@
 (function () {
 if (typeof window.Psmith === 'undefined') window.Psmith = {};
 
-var UI = window.Psmith.UI = function (navbar) {
+var UI = window.Psmith.UI = function () {
     this.in_el = document.getElementById('in');
     this.go_el = document.getElementById('go');
     this.res_el = document.getElementById('res');
     this.res_el.innerHTML = '';
 
-    // init navbar
-    this.navbar = new Psmith.Navbar();
+    // init tabnav
+    this.tabnav = new Psmith.Tabnav();
 
     // init message pubs
     this.go_el.onclick = () => {window.Psmith.bus.publish('search', {'term': this.in_el.value})};
@@ -142,7 +142,6 @@ function build_indices(results) {
 // ------------------
 
 function detail () {
-	console.log('asdfsafd')
 	var id = this.getAttribute('data-id');
 	var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(id));
 	window.Psmith.bus.publish('detail_results', {res: results});
