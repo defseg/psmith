@@ -545,7 +545,7 @@ features.pharyngeal_configuration = [
     }
 ];
 
-features.manner = [ // TODO: fix prenasalized consonants
+features.manner = [ // TODO: any more prenasalized consonants need fixed?
     {
         meta: {
             name: 'plosive',
@@ -1035,7 +1035,4 @@ features.strength = [
         }]
     }
 ]
-
-// TODO: prenasalization should go in here somewhere
-
 })();

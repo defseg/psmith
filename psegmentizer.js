@@ -238,6 +238,4 @@ function test(segment, foo_oa) {
     }
     return false;
 }
-
-// TODO: unknown doesn't work
 })();

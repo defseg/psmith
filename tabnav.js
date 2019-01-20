@@ -17,7 +17,7 @@
         }
 
         Psmith.bus.subscribe('detail_results', function (msg) {
-            this.yeet('Detail', msg.res.consonants.to_html())
+            this.yeet('Detail', msg.res.consonants.to_html()) // TODO replace this! Important!
         }.bind(this));
     }
 
