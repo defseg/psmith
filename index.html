@@ -13,7 +13,7 @@
     <script src='url.js'></script>
     <script src='psegmentizer.js'></script>
     <script src='psegmentizer_features.js'></script>
-    <script src='navbar.js'></script>
+    <script src='tabnav.js'></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <style type='text/css'>
         body {
@@ -27,14 +27,12 @@
         #input-wrapper {
             margin-right: 100px;
         }
-        #detail-container {
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            overflow: scroll;
-        }
-        .hidden {
+        .hidden { /* Huh! HTML5 has a hidden attr. Maybe this would be better? TODO */
             display: none;
+        }
+
+        .nav-link {
+            cursor: pointer;
         }
 
     </style>
@@ -66,112 +64,109 @@
                    xhr.send();
                 </script>
             </section>
-            <section id='help' class='col-sm'>
-                <h3>About</h3>
+            <section id='tabnav' class='col-sm'>
+                <nav id='navs' class='nav' hidden>
+                    <a class='nav-link active' data-nav='Help' tabindex='0'>Help</a>
+                </nav>
+                <div id='help'>
+                    <h3>About</h3>
 
-                <p>This is an unofficial search frontend for PHOIBLE.</p>
+                    <p>This is an unofficial search frontend for PHOIBLE.</p>
 
-                <h3>Searching</h3>
+                    <h3>Searching</h3>
 
-                <p>A search query is minimally composed of a <em>search term</em>. There are two types of search term.</p>
+                    <p>A search query is minimally composed of a <em>search term</em>. There are two types of search term.</p>
 
-                <p>A <em>phoneme term</em> consists of a phoneme enclosed in forward slashes, optionally preceded by "no". This will find all doculects that have (or don't have, if there's a preceding "no") the given phoneme.</p>
+                    <p>A <em>phoneme term</em> consists of a phoneme enclosed in forward slashes, optionally preceded by "no". This will find all doculects that have (or don't have, if there's a preceding "no") the given phoneme.</p>
 
-                <p>For example, <code>/t̪ʙ/</code> will return all doculects that contain the phoneme represented in PHOIBLE by the text string <code>t̪ʙ</code>, and <code>no /m/</code> will return all doculects that do not contain the phoneme represented in PHOIBLE by the text string <code>/m/</code>.</p>
+                    <p>For example, <code>/t̪ʙ/</code> will return all doculects that contain the phoneme represented in PHOIBLE by the text string <code>t̪ʙ</code>, and <code>no /m/</code> will return all doculects that do not contain the phoneme represented in PHOIBLE by the text string <code>/m/</code>.</p>
 
-                <p>A <em>feature term</em> consists of a number (optionally preceded by a <code>&lt;</code> or <code>&gt;</code> sign), a space, and a string of pluses and minuses followed (with no intervening space) by the name of the feature to search. For example, <code>2 +coronal</code> will return all doculects with exactly two [+coronal] segments, and <code>&gt;30 +syllabic</code> will return all doculects with more than thirty vowels.</p>
+                    <p>A <em>feature term</em> consists of a number (optionally preceded by a <code>&lt;</code> or <code>&gt;</code> sign), a space, and a string of pluses and minuses followed (with no intervening space) by the name of the feature to search. For example, <code>2 +coronal</code> will return all doculects with exactly two [+coronal] segments, and <code>&gt;30 +syllabic</code> will return all doculects with more than thirty vowels.</p>
 
-                <p>For the numeric component of the feature term, <code>no</code> can be used to mean <code>0</code>, and <code>any</code> can be used to mean <code>+0</code>.</p>
+                    <p>For the numeric component of the feature term, <code>no</code> can be used to mean <code>0</code>, and <code>any</code> can be used to mean <code>+0</code>.</p>
 
-                <p>To search for multiple feature values on the same phoneme, separate the feature components with a semicolon. For example, <code>any +syllabic;+consonantal</code> will return a list of doculects with syllabic consonants.</p>
+                    <p>To search for multiple feature values on the same phoneme, separate the feature components with a semicolon. For example, <code>any +syllabic;+consonantal</code> will return a list of doculects with syllabic consonants.</p>
 
-                <p>Search terms may be joined by the logical operators <code>and</code> and <code>or</code>. These are postfix.</p>
+                    <p>Search terms may be joined by the logical operators <code>and</code> and <code>or</code>. These are postfix.</p>
 
-                <h3>Examples</h3>
+                    <h3>Examples</h3>
 
-                <p>Find doculects with only two coronal consonants</p>
-                <pre><code>2 +coronal
-                    HAWAIIAN
-                    PIRAHA
-                    ROTOKAS
-                    Pirahã
-                </code></pre>
-                <p>Find doculects with two or fewer vowels</p>
-                <pre><code>&lt;3 +syllabic
-                    zulgo
-                    Cuvok
-                    Buwal
-                </code></pre>
-                <p>Find doculects with two or fewer vowels or the phoneme /ʰd/</p>
-                <pre><code>&lt;3 +syllabic /ʰd/ or
-                    zulgo
-                    Cuvok
-                    Buwal
-                    Günün Yajich
-                    Hoti
-                </code></pre>
-                <p>Find doculects with no rounded segments</p>
-                <pre><code>no +round
-                    Oneida
-                    NIMBORAN
-                    Gu'de
-                </code></pre>
-                <p>Find doculects with /ʰd/ and no /m/</p>
-                <pre><code>/ʰd/ no /m/ and
-                    Hoti
-                </code></pre>
+                    <p>Find doculects with only two coronal consonants</p>
+                    <pre><code>2 +coronal
+                        HAWAIIAN
+                        PIRAHA
+                        ROTOKAS
+                        Pirahã
+                    </code></pre>
+                    <p>Find doculects with two or fewer vowels</p>
+                    <pre><code>&lt;3 +syllabic
+                        zulgo
+                        Cuvok
+                        Buwal
+                    </code></pre>
+                    <p>Find doculects with two or fewer vowels or the phoneme /ʰd/</p>
+                    <pre><code>&lt;3 +syllabic /ʰd/ or
+                        zulgo
+                        Cuvok
+                        Buwal
+                        Günün Yajich
+                        Hoti
+                    </code></pre>
+                    <p>Find doculects with no rounded segments</p>
+                    <pre><code>no +round
+                        Oneida
+                        NIMBORAN
+                        Gu'de
+                    </code></pre>
+                    <p>Find doculects with /ʰd/ and no /m/</p>
+                    <pre><code>/ʰd/ no /m/ and
+                        Hoti
+                    </code></pre>
 
-                <h3>List of features</h3>
-                <p>These are taken directly from PHOIBLE's featural decomposition, except the names of the features have been converted from camelCase to snake_case and 'raisedLarynxEjective' and 'loweredLarynxImplosive' have been renamed to <code>ejective</code> and <code>implosive</code>.</p><code>
-                <ul>
-                    <li>tone
-                    </li><li>stress
-                    </li><li>syllabic
-                    </li><li>short
-                    </li><li>long
-                    </li><li>consonantal
-                    </li><li>sonorant
-                    </li><li>continuant
-                    </li><li>delayed_release
-                    </li><li>approximant
-                    </li><li>tap
-                    </li><li>trill
-                    </li><li>nasal
-                    </li><li>lateral
-                    </li><li>labial
-                    </li><li>round
-                    </li><li>labiodental
-                    </li><li>coronal
-                    </li><li>anterior
-                    </li><li>distributed
-                    </li><li>strident
-                    </li><li>dorsal
-                    </li><li>high
-                    </li><li>low
-                    </li><li>front
-                    </li><li>back
-                    </li><li>tense
-                    </li><li>retracted_tongue_root
-                    </li><li>advanced_tongue_root
-                    </li><li>periodic_glottal_source
-                    </li><li>epilaryngeal_source
-                    </li><li>spread_glottis
-                    </li><li>constricted_glottis
-                    </li><li>fortis
-                    </li><li>ejective
-                    </li><li>implosive
-                    </li><li>click</li>
-                </ul></code>
+                    <h3>List of features</h3>
+                    <p>These are taken directly from PHOIBLE's featural decomposition, except the names of the features have been converted from camelCase to snake_case and 'raisedLarynxEjective' and 'loweredLarynxImplosive' have been renamed to <code>ejective</code> and <code>implosive</code>.</p><code>
+                    <ul>
+                        <li>tone
+                        </li><li>stress
+                        </li><li>syllabic
+                        </li><li>short
+                        </li><li>long
+                        </li><li>consonantal
+                        </li><li>sonorant
+                        </li><li>continuant
+                        </li><li>delayed_release
+                        </li><li>approximant
+                        </li><li>tap
+                        </li><li>trill
+                        </li><li>nasal
+                        </li><li>lateral
+                        </li><li>labial
+                        </li><li>round
+                        </li><li>labiodental
+                        </li><li>coronal
+                        </li><li>anterior
+                        </li><li>distributed
+                        </li><li>strident
+                        </li><li>dorsal
+                        </li><li>high
+                        </li><li>low
+                        </li><li>front
+                        </li><li>back
+                        </li><li>tense
+                        </li><li>retracted_tongue_root
+                        </li><li>advanced_tongue_root
+                        </li><li>periodic_glottal_source
+                        </li><li>epilaryngeal_source
+                        </li><li>spread_glottis
+                        </li><li>constricted_glottis
+                        </li><li>fortis
+                        </li><li>ejective
+                        </li><li>implosive
+                        </li><li>click</li>
+                    </ul></code>
+                </div>
             </section>
         </div>
     </div>
-    <section id='detail-container'>
-        <a id='detail-pre' href='#'>
-            ^
-        </a>
-        <div id='detail' class='hidden'>
-            Detail goes here, toot toot.
-        </div>
-    </section>
 </body>
 </html>

@@ -60,6 +60,9 @@
     Tabnav.prototype.add_nav = function (name) {
         if (this.navs.has(name)) return;
 
+        // Navbar starts out hidden because it's a little ugly otherwise.
+        this.nav_el.removeAttribute('hidden'); // Will return silently if it's already removed.
+
         var new_el = document.createElement('a');
         new_el.className = 'nav-link';
         new_el.innerText = name;
