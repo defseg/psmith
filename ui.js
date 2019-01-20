@@ -16,12 +16,7 @@ var UI = window.Psmith.UI = function () {
     // init message subs
     window.Psmith.bus.subscribe('search_results', this.display_search_results.bind(this));
     window.Psmith.bus.subscribe('search_error', this.display_error_or_no_results.bind(this));
-
-    // Not sure where else to put this. TODO? Probably shouldn't be here.
-    window.Psmith.bus.subscribe('detail', function (msg) {
-    	var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(msg.term));
-		window.Psmith.bus.publish('detail_results', {res: results});
-	});
+    window.Psmith.bus.subscribe('detail_error', (msg) => console.error(msg.error)); // TODO handle this better?
 
     window.Psmith.url.init_url_handler();
 

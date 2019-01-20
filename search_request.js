@@ -8,7 +8,16 @@ Psmith.bus.subscribe('search', function (msg) {
 			Psmith.bus.publish('search_results', {'res': results});
 		}
 	} catch (e) {
-		Psmith.bus.publish('search_error', {'error': e})
+		Psmith.bus.publish('search_error', {'error': e});
 	}
 })
+
+Psmith.bus.subscribe('detail', function (msg) {
+	try {
+		var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(msg.term));
+		window.Psmith.bus.publish('detail_results', {res: results});
+	} catch (e) {
+		Psmith.bus.publish('detail_error', {'error': e});
+	}
+});
 })();
