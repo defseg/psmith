@@ -14,8 +14,9 @@ Psmith.bus.subscribe('search', function (msg) {
 
 Psmith.bus.subscribe('detail', function (msg) {
 	try {
-		var results = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(msg.term));
-		window.Psmith.bus.publish('detail_results', {res: results});
+		var segments = Psmith.psegmentizer.psegmentize(Psmith.psherlock.get_inventory(msg.term));
+		var language_info = Psmith.psherlock.get_language_info(msg.term);
+		window.Psmith.bus.publish('detail_results', {language_info: language_info, segments: segments});
 	} catch (e) {
 		Psmith.bus.publish('detail_error', {'error': e});
 	}

@@ -17,7 +17,7 @@
         }
 
         Psmith.bus.subscribe('detail_results', function (msg) {
-            this.yeet('Detail', msg.res.consonants.to_html()) // TODO replace this! Important!
+            this.yeet('Detail', Psmith.UI.language_detail(msg));
         }.bind(this));
     }
 
@@ -44,7 +44,13 @@
 
     Tabnav.prototype.set = function (name, contents) {
         // Set the contents of a tab.
-        this.tabs.get(name).innerHTML = contents;
+        if (typeof contents === 'string') {
+            this.tabs.get(name).innerHTML = contents;
+        } else if (typeof contents === 'object') { // Hopefully it's a node.
+            this.tabs.get(name).innerHTML = '';
+            this.tabs.get(name).appendChild(contents);
+        }
+
     }
 
     Tabnav.prototype.show = function (name) {

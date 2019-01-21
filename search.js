@@ -36,6 +36,40 @@ psherlock.get_inventory = function (id) {
         WHERE languages.id = ${id};`)[0];
 }
 
+psherlock.get_language_info = function (id) {
+    return db.exec(`SELECT * FROM languages WHERE languages.id = ${id}`)[0];
+}
+
+// -----------
+// -- utils --
+// -----------
+
+psherlock.indexify = function (results) {
+    return _indexify(results.values, build_indices(results));
+}
+
+psherlock.indexify = function (results) {
+    var values = results.values;
+    var indices = psherlock.build_indices(results);
+    var new_results = [];
+    for (let res of values) {
+        var new_res = {};
+        for (let index in indices) {
+          new_res[index] = res[indices[index]];
+        }
+        new_results.push(new_res);
+    }
+    return new_results;
+}
+
+psherlock.build_indices = function (results) {
+    var indices = {};
+    for (let i = 0; i < results.columns.length; i++) {
+        indices[results.columns[i]] = i;
+    }
+    return indices;
+}
+
 // -------------
 // -- private --
 // -------------

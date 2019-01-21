@@ -42,6 +42,7 @@ features.place_and_secondary_articulation = [
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
+        ,   'labiodental': '-'
         ,   'coronal':     '-'
         ,   'dorsal':      '-'
         }]
@@ -52,6 +53,18 @@ features.place_and_secondary_articulation = [
         }, features: [{
             'round':       '-'
         ,   'labiodental': '+'
+        ,   'dorsal':      '-'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized labiodental',
+            order: 3.5
+        }, features: [{
+            'round':       '-'
+        ,   'labiodental': '+'
+        ,   'dorsal':      '+'
+        ,   'front':       '+'
+        ,   'back':        '+'
         }]
     }, {
         meta: {
@@ -376,6 +389,19 @@ features.place_and_secondary_articulation = [
         }]
     }, {
         meta: {
+            name: 'palatalized velar',
+            order: 33,
+        }, features: [{
+            'labial':      '-'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
             name: 'velar',
             order: 29
         }, features: [{
@@ -431,19 +457,6 @@ features.place_and_secondary_articulation = [
         }]
     }, {
         meta: {
-            name: 'palatalized velar',
-            order: 33,
-        }, features: [{
-            'labial':      '-'
-        ,   'coronal':     '-'
-        ,   'dorsal':      '+'
-        ,   'high':        '+'
-        ,   'low':         '-'
-        ,   'front':       '+'
-        ,   'back':        '+'
-        }]
-    }, {
-        meta: {
             name: 'labial-alveolar',
             order: 34
         }, features: [{
@@ -464,6 +477,20 @@ features.place_and_secondary_articulation = [
         ,   'coronal':     '-'
         ,   'dorsal':      '+'
         ,   'round':       '-'
+        }]
+    }, {
+        meta: {
+            name: 'palatalized labial-velar',
+            order: 35.5
+        }, features: [{
+            'labial': 'mu' // fake feature - we use string processing
+        }]
+    }, {
+        meta: {
+            name: 'rounded labial-velar',
+            order: 35.7
+        }, features: [{
+            'labial': 'mu' // fake feature
         }]
     }, {
         meta: {

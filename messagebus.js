@@ -25,7 +25,7 @@
 	,	'search_results'  // defines 'res'
 	,	'search_error'    // defines 'error'
 	,	'detail'          // defines 'term'
-	,	'detail_results'  // defines 'res'
+	,	'detail_results'  // defines 'language_info, segments'
 	,   'detail_error'    // defines 'error'
 	]);
 })();

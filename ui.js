@@ -37,7 +37,7 @@ UI.prototype.display_search_results = function (msg) {
 	var results = msg.res;
 
 	var values = results[0].values;
-	var indices = build_indices(results[0]);
+	var indices = Psmith.psherlock.build_indices(results[0]);
 
 	// later on, this will be taken care of in the backend. TODO
 	values = munge_results(values, indices);
@@ -68,9 +68,50 @@ function munge_results(results, indices) {
 	return new_results;
 }
 
-// ----------------
-// -- templating --
-// ----------------
+// -----------------
+// -- detail view --
+// -----------------
+
+UI.language_detail = function (res) {
+	var info = Psmith.psherlock.indexify(res.language_info)[0];
+	var segments = res.segments;
+
+	var el = document.createElement('div');
+
+
+	var el_html = `
+	<h3 class='language-name'>${info.language_name} (${info.source})</h3>
+
+		<div class='language-family'>Family: ${info.language_family_genus}</div>
+		<div class='language-code'>ISO 639-3: 
+			<a href='https://www.ethnologue.com/language/${info.language_code}'>
+				${info.language_code}
+			</a>
+		</div>
+	<h4 class='language-segments'>Consonants (${segments.consonants.size()})</h4>
+		${segments.consonants.to_html()}`;
+
+	if (segments.clicks.size() > 0) {
+		el_html += `<h4 class='language-segments'>Clicks (${segments.clicks.size()})</h4>
+		${segments.clicks.to_html()}`;
+	}
+
+	el_html += `<h4 class='language-segments'>Vowels (${segments.vowels.size()})</h4>
+	${segments.vowels.to_html()}`;
+
+	if (segments.tones.size() > 0) {
+		el_html += `<h4 class='language-segments'>Tones (${segments.tones.size()})</h4>
+		${segments.tones.to_html()}`;
+	}
+
+	el.innerHTML = el_html;
+
+	return el;
+}
+
+// ------------------------------
+// -- search result templating --
+// ------------------------------
 
 function language_template(row, indices) {
 	var language_el = document.createElement('tr');
@@ -128,14 +169,6 @@ function phoneme_display(row, indices) {
 
 	el.textContent = phonemes.join(' ');
 	return el;
-}
-
-function build_indices(results) {
-	var indices = {};
-	for (let i = 0; i < results.columns.length; i++) {
-		indices[results.columns[i]] = i;
-	}
-	return indices;
 }
 
 // ------------------

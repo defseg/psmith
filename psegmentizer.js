@@ -6,7 +6,7 @@ if (typeof window.Psmith.psegmentizer === 'undefined') window.Psmith.psegmentize
 window.Psmith.psegmentizer.psegmentize = function (segments) {
     // Pass in the raw results of get_inventory.
 
-    segments = indexify(segments.values, build_indices(segments));
+    segments = Psmith.psherlock.indexify(segments);
     var mapped = segments.map(x => segment_info(x));
 
     var consonants = [];
@@ -29,7 +29,7 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
 
     return {
         'consonants': build_grid(consonants),
-        'clicks': build_grid(clicks),
+        'clicks': build_grid(clicks), // TODO
         'vowels': new PhonemeArray(vowels), // TODO make a nice grid for these too
         'tones': new PhonemeArray(tones)
     }
@@ -57,7 +57,7 @@ function build_grid(phonemes) {
     // Second iteration over phonemes: populate the grid
     for (let p of phonemes) {
         var foo = get_y_x(p).map(mappem)
-        phoneme_matrix.get(foo[0],foo[1]).push(p);
+        phoneme_matrix.push(foo[0],foo[1], p);
     }
 
     return phoneme_matrix
@@ -67,6 +67,7 @@ function PhonemeMatrix(ys, xs) {
     this.map = new Map();
     this.y_headers = [];
     this.x_headers = [];
+    this._size = 0;
 
     for (let y of ys) this.y_headers.push(y);
     for (let x of xs) this.x_headers.push(x);
@@ -74,12 +75,16 @@ function PhonemeMatrix(ys, xs) {
     for (let y of ys) {
         this.map.set(y, new Map());
         for (let x of xs) {
-            this.map.get(y).set(x, []);
+            this.map.get(y).set(x, []); // TODO: should this be a set? Then we'd just sort them later.
         }
     }
 }
 PhonemeMatrix.prototype.get = function (y, x) {
     return this.map.get(y).get(x);
+}
+PhonemeMatrix.prototype.push = function (y, x, foo) {
+    this.get(y, x).push(foo);
+    this._size += 1;
 }
 PhonemeMatrix.prototype.count_y = function (y) {
     // Return the number of distinct phonemes in a chart row.
@@ -92,18 +97,24 @@ PhonemeMatrix.prototype.count_x = function (x) {
 PhonemeMatrix.prototype.merge_columns = function (merge_from, merge_into) {
     // TODO
 }
-
+PhonemeMatrix.prototype.is_not_empty = function (y) {
+    return this._size > 0;
+}
+PhonemeMatrix.prototype.size = function () { // Seems easier than tracking a size attr in PhonemeArray
+    return this._size;
+}
 PhonemeMatrix.prototype.to_html = function () {
     // just build a string for now. TODO maybe do it right (build nodes) later
-    var res = '<table>';
+    var res = '<table class=\'inventory\'>';
     
     // need to build x headers first
-    res += '<tr><th></th>';
-    for (let x_header of this.x_headers) res += `<th>${x_header}</th>`;
+    // res += '<tr><th></th>';
+    // for (let x_header of this.x_headers) res += `<th>${x_header}</th>`;
 
     for (let y of this.map.entries()) {
         var [y_header, y_contents] = y;
-        res += `<tr><th>${y_header}</th>`;
+        res += '<tr>'
+        // res += `<th>${y_header}</th>`;
         for (let x of y_contents.entries()) {
             var [x_header, x_contents] = x;
             res += `<td>${x_contents.map(i => i.phoneme).join(' ')}</td>`;
@@ -119,34 +130,17 @@ function PhonemeArray (phonemes) {
     this.phonemes = phonemes;
 }
 PhonemeArray.prototype.to_html = function () {
-    return `<span>${this.phonemes.join(' ')}</span>`
+    return `<span>${this.phonemes.map(x => x.phoneme).sort().join(' ')}</span>`;
 }
+PhonemeArray.prototype.size = function () {
+    return this.phonemes.length;
+}
+
 
 
 function get_y_x(phoneme) {
     if (phoneme.klass === 'consonant' || phoneme.klass === 'click') return [phoneme.manner, phoneme.place];
     throw new Error('TODO: get_x_y for vowels');
-}
-
-// TODO: move this to a utils file or something - I think there's some code duplication here
-function indexify(values, indices) {
-  var new_results = [];
-  for (let res of values) {
-    var new_res = {};
-    for (let index in indices) {
-      new_res[index] = res[indices[index]];
-    }
-    new_results.push(new_res);
-  }
-  return new_results;
-}
-
-function build_indices(results) {
-    var indices = {};
-    for (let i = 0; i < results.columns.length; i++) {
-        indices[results.columns[i]] = i;
-    }
-    return indices;
 }
 
 function segment_info(segment) {
@@ -203,15 +197,16 @@ function get_place_and_secondary_articulation(segment) {
 
     // Errata
     if (seg === 'ŋm') return get_by_name('place_and_secondary_articulation', 'labial-velar'); // given as -,+labial - this should be +labial
-    if (seg === 'ɠɓ') return get_by_name('place_and_secondary_articulation', 'labial-velar'); 
-    if (seg === 'ɡbʲ') return get_by_name('place_and_secondary_articulation', 'palatalized labial-velar');
-    if (seg === 'ɡbʷ') return get_by_name('place_and_secondary_articulation', 'rounded labial-velar');
+    if (seg === 'ɠɓ') return get_by_name('place_and_secondary_articulation', 'labial-velar');
+    if (seg === 'ɡbʲ' || seg === 'kpʲ') return get_by_name('place_and_secondary_articulation', 'palatalized labial-velar');
+    if (seg === 'ɡbʷ' || seg === 'kpʷ') return get_by_name('place_and_secondary_articulation', 'rounded labial-velar');
     if (seg === 'nɡ') return get_by_name('place_and_secondary_articulation', 'velar');
     if (seg === 'nɟ') return get_by_name('place_and_secondary_articulation', 'palatal');
     if (seg === 'ndzʲ') return get_by_name('place_and_secondary_articulation', 'palatalized alveolar'); // should be +back but isn't
     if (seg === 'ɹ' || seg === 'ɹ' || seg === 'ɹˤ' || seg === 'ɹ̰ˤ' || seg === 'ɹ̝') return get_by_name('place_and_secondary_articulation', 'alveolar') // given as alveolopalatal
     if (seg === 'ŋmkpɾ') return get_by_name('place_and_secondary_articulation', 'labial-velar');
     if (seg === 'nɡɾ') return get_by_name('place_and_secondary_articulation', 'velar');
+    if (seg === 'ɟʲ') return get_by_name('place_and_secondary_articulation', 'palatal'); // what in tarnation?
 
     return get('place_and_secondary_articulation', segment)
 }
