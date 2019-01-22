@@ -992,16 +992,13 @@ features.airstream_mechanism = [
             order: 2
         }, features: [{
             'ejective': '+'
-        ,   'implosive': '-'
-        ,   'constricted_glottis': '-'
         }]
     }, {
         meta: {
             name: 'implosive',
             order: 3
         }, features: [{
-            'ejective': '-'
-        ,   'implosive': '+'
+            'implosive': '+'
         ,   'constricted_glottis': '-'
         }]
     }, {
