@@ -953,7 +953,7 @@ features.voicing = [
     {
         meta: {
             name: 'breathy-voiced',
-            order: 3
+            order: 2
         }, features: [{
         'periodic_glottal_source': '+'
     ,   'spread_glottis':          '+'
@@ -961,7 +961,7 @@ features.voicing = [
     }, {
         meta: {
             name: 'voiced',
-            order: 2
+            order: 3
         }, features: [{
             'periodic_glottal_source': '+'
         ,   'spread_glottis':          '-'

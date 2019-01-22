@@ -117,7 +117,7 @@ PhonemeMatrix.prototype.to_html = function () {
         // res += `<th>${y_header}</th>`;
         for (let x of y_contents.entries()) {
             var [x_header, x_contents] = x;
-            res += `<td>${x_contents.map(i => i.phoneme).join(' ')}</td>`;
+            res += `<td>${x_contents.sort(order_consonants).map(i => i.phoneme).join(' ')}</td>`;
         }
         res += '</tr>';
     }
@@ -234,5 +234,24 @@ function test(segment, foo_oa) {
         if (matches) return true;
     }
     return false;
+}
+
+function order_consonants(a, b) {
+    var feature_order = [
+        'voicing'
+    ,   'pharyngeal_configuration'
+    ,   'airstream_mechanism'
+    ,   'duration'
+    ,   'strength'
+    ];
+
+    for (let f of feature_order) {
+        if (a[f].order < b[f].order) return -1;
+        if (a[f].order > b[f].order) return 1;
+    }
+
+    if (a > b) return -1;
+    if (a < b) return 1;
+    return 0;
 }
 })();
