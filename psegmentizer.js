@@ -198,15 +198,17 @@ function get_place_and_secondary_articulation(segment) {
     // Errata
     if (seg === 'ŋm') return get_by_name('place_and_secondary_articulation', 'labial-velar'); // given as -,+labial - this should be +labial
     if (seg === 'ɠɓ') return get_by_name('place_and_secondary_articulation', 'labial-velar');
-    if (seg === 'ɡbʲ' || seg === 'kpʲ') return get_by_name('place_and_secondary_articulation', 'palatalized labial-velar');
-    if (seg === 'ɡbʷ' || seg === 'kpʷ') return get_by_name('place_and_secondary_articulation', 'rounded labial-velar');
+    if (seg === 'ɡbʲ' || seg === 'kpʲ' || seg === 'ŋmʲ') return get_by_name('place_and_secondary_articulation', 'palatalized labial-velar');
+    if (seg === 'ɡbʷ' || seg === 'kpʷ' || seg === 'ŋmʷ') return get_by_name('place_and_secondary_articulation', 'rounded labial-velar');
     if (seg === 'nɡ') return get_by_name('place_and_secondary_articulation', 'velar');
-    if (seg === 'nɟ') return get_by_name('place_and_secondary_articulation', 'palatal');
+    if (seg === 'nɟ' || seg === 'ɟʲ' || seg === 'ɲcʲ') return get_by_name('place_and_secondary_articulation', 'palatal');
     if (seg === 'ndzʲ') return get_by_name('place_and_secondary_articulation', 'palatalized alveolar'); // should be +back but isn't
     if (seg === 'ɹ' || seg === 'ɹ' || seg === 'ɹˤ' || seg === 'ɹ̰ˤ' || seg === 'ɹ̝') return get_by_name('place_and_secondary_articulation', 'alveolar') // given as alveolopalatal
     if (seg === 'ŋmkpɾ') return get_by_name('place_and_secondary_articulation', 'labial-velar');
     if (seg === 'nɡɾ') return get_by_name('place_and_secondary_articulation', 'velar');
-    if (seg === 'ɟʲ') return get_by_name('place_and_secondary_articulation', 'palatal'); // what in tarnation?
+
+    // you know, I don't think Irish has labial-velars
+    if (seg.indexOf('ʷˠ') > -1) return get_by_name('place_and_secondary_articulation', 'rounded labial');
 
     return get('place_and_secondary_articulation', segment)
 }

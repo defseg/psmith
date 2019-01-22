@@ -88,7 +88,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'rounded dental',
-            order: 6
+            order: 8
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
@@ -100,7 +100,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'palatalized dental',
-            order: 7
+            order: 6
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -113,7 +113,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'velarized dental',
-            order: 8
+            order: 7
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -137,7 +137,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'rounded alveolar',
-            order: 10
+            order: 12
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
@@ -149,7 +149,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'palatalized alveolar',
-            order: 11
+            order: 10
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -162,7 +162,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'rounded palatalized alveolar',
-            order: 12
+            order: 12.5
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
@@ -176,7 +176,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'velarized alveolar',
-            order: 13
+            order: 10
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -200,7 +200,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'rounded retroflex',
-            order: 15
+            order: 16
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
@@ -212,7 +212,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'palatalized retroflex',
-            order: 16
+            order: 15
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -236,7 +236,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'rounded alveolopalatal',
-            order: 18
+            order: 20
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
@@ -248,7 +248,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'palatalized alveolopalatal',
-            order: 19
+            order: 18
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -261,7 +261,7 @@ features.place_and_secondary_articulation = [
     },  {
         meta: {
             name: 'velarized alveolopalatal',
-            order: 20
+            order: 19
         }, features: [{
             'labial':      '-'
         ,   'coronal':     '+'
@@ -287,7 +287,7 @@ features.place_and_secondary_articulation = [
     },  {
         meta: {
             name: 'rounded palatoalveolar',
-            order: 22
+            order: 24
         }, features: [{ // and rounding makes palatoalveolars stop being +dorsal...
             'labial':      '+'
         ,   'round':       '+'
@@ -308,7 +308,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'rounded palatalized palatoalveolar',
-            order: 24,
+            order: 22,
         }, features: [{
             'labial':      '+'
         ,   'round':       '+'
@@ -390,9 +390,23 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'palatalized velar',
-            order: 33,
+            order: 28.5,
         }, features: [{
             'labial':      '-'
+        ,   'coronal':     '-'
+        ,   'dorsal':      '+'
+        ,   'high':        '+'
+        ,   'low':         '-'
+        ,   'front':       '+'
+        ,   'back':        '+'
+        }]
+    }, {
+        meta: {
+            name: 'rounded palatalized velar',
+            order: 28.7
+        }, features: [{
+            'labial':      '+'
+        ,   'round':       '+'
         ,   'coronal':     '-'
         ,   'dorsal':      '+'
         ,   'high':        '+'
@@ -458,7 +472,7 @@ features.place_and_secondary_articulation = [
     }, {
         meta: {
             name: 'labial-alveolar',
-            order: 34
+            order: 9.1
         }, features: [{
             'labial':      '+'
         ,   'round':       '-'
@@ -573,7 +587,42 @@ features.pharyngeal_configuration = [
 ];
 
 features.manner = [ // TODO: any more prenasalized consonants need fixed?
-    {
+    { // need to move this up here for dl
+        meta: {
+            name: 'lateral affricate',
+            order: 2.5
+        }, features: [{
+            'consonantal':     '+'
+        ,   'sonorant':        '-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '+'
+        }, { // n̤d̤ɮ̤
+            'consonantal':     '+'
+        ,   'sonorant':        '+,-'
+        ,   'continuant':      '-'
+        ,   'delayed_release': '+'
+        ,   'approximant':     '-'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '+,-'
+        ,   'lateral':         '+'
+        }, { // dl
+            'consonantal':     '+'
+        ,   'sonorant':        '-,+'
+        ,   'continuant':      '-,+'
+        ,   'delayed_release': '-'
+        ,   'approximant':     '-,+'
+        ,   'tap':             '-'
+        ,   'trill':           '-'
+        ,   'nasal':           '-'
+        ,   'lateral':         '-,+'
+        }]
+    }, {
         meta: {
             name: 'plosive',
             order: 0
@@ -881,31 +930,6 @@ features.manner = [ // TODO: any more prenasalized consonants need fixed?
         ,   'tap':             '-'
         ,   'trill':           '-'
         ,   'nasal':           '-'
-        ,   'lateral':         '+'
-        }]
-    }, {
-        meta: {
-            name: 'lateral affricate',
-            order: 2.5
-        }, features: [{
-            'consonantal':     '+'
-        ,   'sonorant':        '-'
-        ,   'continuant':      '-'
-        ,   'delayed_release': '+'
-        ,   'approximant':     '-'
-        ,   'tap':             '-'
-        ,   'trill':           '-'
-        ,   'nasal':           '-'
-        ,   'lateral':         '+'
-        }, { // n̤d̤ɮ̤
-            'consonantal':     '+'
-        ,   'sonorant':        '+,-'
-        ,   'continuant':      '-'
-        ,   'delayed_release': '+'
-        ,   'approximant':     '-'
-        ,   'tap':             '-'
-        ,   'trill':           '-'
-        ,   'nasal':           '+,-'
         ,   'lateral':         '+'
         }]
     }, {
