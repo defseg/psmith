@@ -26,10 +26,9 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
             tones.push(x);
         }
     });
-
     return {
         'consonants': build_grid(consonants),
-        'clicks': build_grid(clicks), // TODO
+        'clicks': build_grid(clicks),
         'vowels': new PhonemeArray(vowels), // TODO make a nice grid for these too
         'tones': new PhonemeArray(tones)
     }
@@ -62,6 +61,10 @@ function build_grid(phonemes) {
 
     return phoneme_matrix
 }
+
+// ------------------------------------
+// -- PhonemeMatrix and PhonemeArray --
+// ------------------------------------
 
 function PhonemeMatrix(ys, xs) {
     this.map = new Map();
@@ -136,12 +139,14 @@ PhonemeArray.prototype.size = function () {
     return this.phonemes.length;
 }
 
-
-
 function get_y_x(phoneme) {
     if (phoneme.klass === 'consonant' || phoneme.klass === 'click') return [phoneme.manner, phoneme.place];
     throw new Error('TODO: get_x_y for vowels');
 }
+
+// -------------------------
+// -- Segment information --
+// -------------------------
 
 function segment_info(segment) {
     // vowels
@@ -152,7 +157,7 @@ function segment_info(segment) {
     if (segment.tone === '+') return tone_info(segment);
 
     // click consonants
-    if (segment.click === '+') return consonant_info(segment, true);
+    if (segment.click === '+') return click_info(segment);
 
     // if it's not a vowel or a tone, it's a consonant
     return consonant_info(segment);
@@ -177,7 +182,7 @@ function tone_info(segment) {
 function consonant_info(segment, is_click = false) {
     return {
         phoneme: segment.segment
-    ,   klass: is_click ? 'click' : 'consonant'
+    ,   klass: 'consonant'
     ,   place: get_place_and_secondary_articulation(segment)
     ,   pharyngeal_configuration: get('pharyngeal_configuration', segment)
     ,   manner: get('manner', segment)
@@ -187,6 +192,77 @@ function consonant_info(segment, is_click = false) {
     ,   strength: get('strength', segment)
     }
 }
+
+// ----------------
+// -- Click info --
+// ----------------
+
+// Don't waste time recomputing these, but also don't compute them on load.
+// If you compute them on load, the order of your script tags matters, and that'll be confusing!
+// TODO this is really dumb.
+var places = undefined;
+var precomponents = undefined;
+var effluxes = undefined;
+
+var click_characters = 'ǃǀǁǂ‼ʘ';
+var split_regex = new RegExp(`([^${click_characters}]*)([${click_characters}])([^${click_characters}]*)`)
+function compute_places() {
+    return {
+        'ǃ': get_by_name('place_and_secondary_articulation', 'alveolar')
+    ,   'ǀ': get_by_name('place_and_secondary_articulation', 'dental')
+    ,   'ǁ': get_by_name('place_and_secondary_articulation', 'alveolopalatal') // cheap hack - these are lateral, but the ordering works out
+    ,   'ǂ': get_by_name('place_and_secondary_articulation', 'palatal')
+    ,   '‼': get_by_name('place_and_secondary_articulation', 'retroflex')
+    ,   'ʘ': get_by_name('place_and_secondary_articulation', 'labial')
+    }
+}
+function compute_precomponents() {
+    var res = {};
+    for (let i of Psmith.psegmentizer.features.click_precomponent) {
+        res[i.meta.string] = i.meta;
+    }
+    return res;
+}
+function compute_effluxes() {
+    var res = {};
+    for (let i of Psmith.psegmentizer.features.click_efflux) {
+        res[i.meta.string] = i.meta;
+    }    
+    return res;
+}
+
+function click_info(segment) {
+    // This is all string processing. PHOIBLE's featural model doesn't handle clicks very well.
+
+    // First, compute the above objects if we need to.
+    if (places === undefined) places = compute_places();
+    if (precomponents === undefined) precomponents = compute_precomponents();
+    if (effluxes === undefined) effluxes = compute_effluxes();
+
+    var seg = segment.segment.replace(/ǃǃ/,'‼'); // Make this a single character so the regex is simpler.
+    seg = seg.replace(/ǃ̠/,'‼'); // This looks like a POA.
+    seg = seg.replace(/[\u0353]/,''); // Discard apparently spurious diacritics.
+    seg = seg.replace('ǂˡ','ǁ') // Alternate notation for the lateral click in !Xu.
+    seg = seg.replace('ʼʰ', 'ʰʼ') // Fix !Xun
+    var [_, precomponent, influx, efflux] = split_regex.exec(seg);
+
+    // We want a nice Cartesian chart, so mash the influxes and effluxes together.
+    var precomponent_order = precomponents[precomponent].order;
+    var efflux_order = effluxes[efflux].order;
+    var manner_order = precomponent_order * 100 + efflux_order;
+
+    var res = {
+        phoneme: segment.segment
+    ,   klass: 'click'
+    ,   place: places[influx]
+    ,   manner: {name: manner_order, order: manner_order}
+    }
+    return res
+}
+
+// ----------------------
+// -- Helper functions --
+// ----------------------
 
 function get_place_and_secondary_articulation(segment) {
     var seg = segment.segment;
@@ -246,10 +322,16 @@ function order_consonants(a, b) {
     ];
 
     for (let f of feature_order) {
+        if (!a.hasOwnProperty(f) || !b.hasOwnProperty(f) || !a[f].hasOwnProperty('order') 
+            || !b[f].hasOwnProperty('order')) {continue};
         if (a[f].order < b[f].order) return -1;
         if (a[f].order > b[f].order) return 1;
     }
 
+    return lexicographic_order(a, b);
+}
+
+function lexicographic_order(a, b) {
     if (a > b) return -1;
     if (a < b) return 1;
     return 0;

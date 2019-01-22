@@ -1086,4 +1086,276 @@ features.strength = [
         }]
     }
 ]
+
+// Click stuff. Doesn't use features - PHOIBLE's featural decomposition of clicks is Not Good.
+// So it's all string processing. Check psegmentizer.js.
+features.click_precomponent = [
+    {
+        meta: {
+            name: 'unvoiced'
+        ,   order: 1
+        ,   string: 'k'
+        }, features: []
+    }, {
+        meta: {
+            name: 'nasal'
+        ,   order: 2
+        ,   string: 'ŋ'
+        }, features: []
+    }, {
+        meta: {
+            name: 'voiced'
+        ,   order: 3
+        ,   string: 'ɡ'
+        }, features: []
+    }, {
+        meta: {
+            name: 'voiceless nasal'
+        ,   order: 4
+        ,   string: 'ŋ̥'
+        }, features: []
+    }, {
+        meta: {
+            name: 'breathy-voiced'
+        ,   order: 5
+        ,   string: 'ɡ̤'
+        }, features: []
+    }, {
+        meta: {
+            name: 'breathy-voiced nasal'
+        ,   order: 6
+        ,   string: 'ŋ̤'
+        }, features: []
+    }, {
+        meta: {
+            name: 'creaky-voiced'
+        ,   order: 7
+        ,   string: 'ɡ̰'
+        }, features: []
+    }, {
+        meta: {
+            name: 'prenasalized'
+        ,   order: 8
+        ,   string: 'ŋ̤ɡ'
+        }, features: []
+    }, {
+        meta: {
+            name: 'voiced uvular'
+        ,   order: 10
+        ,   string: 'ɢ'
+        }, features: []
+    }, {
+        meta: {
+            name: 'unvoiced uvular'
+        ,   order: 9
+        ,   string: 'q'
+        }, features: []
+    }, {
+        meta: {
+            name: 'prenasalized uvular'
+        ,   order: 11
+        ,   string: 'ɴɢ'
+        }, features: []
+    }, {
+        meta: {
+            name: 'glottalized nasal' // or creaky-voiced?
+        ,   order: 8.5
+        ,   string: 'ʼŋ'
+        }, features: []
+    }, 
+];
+
+// These were all automatically generated, so there are no names for now. (TODO?)
+// The diacritics   (COMBINING X BELOW) and ... have been removed.
+// They don't appear to be load-bearing - languages either have them on an entire series or don't.
+features.click_efflux = [ 
+    {
+        meta: {
+            name: ''
+        ,   order: 1
+        ,   string: ""
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 2
+        ,   string: "ʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 4
+        ,   string: "̠"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 5
+        ,   string: "ʼ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 6
+        ,   string: "ˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 7
+        ,   string: "ʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 8
+        ,   string: "x"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 9
+        ,   string: "̠ʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 10
+        ,   string: "̠ˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 11
+        ,   string: "ˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 12
+        ,   string: "xʼ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 13
+        ,   string: "xˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 14
+        ,   string: "ˠˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 15
+        ,   string: "x"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 16
+        ,   string: "ˡ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 17
+        ,   string: "xˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 18
+        ,   string: "ˡʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 19
+        ,   string: "ˡx"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 20
+        ,   string: "ˡxˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 21
+        ,   string: "ˡˀ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 22
+        ,   string: "xʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 23
+        ,   string: "ˠʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 24
+        ,   string: "̠xʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 25
+        ,   string: "xʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 26
+        ,   string: "̪"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 27
+        ,   string: "ʷ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 28
+        ,   string: "ʰʷ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 29
+        ,   string: "qʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 30
+        ,   string: "kxʼ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 31
+        ,   string: "ʼʰ"
+        }, features: {}
+    }, {
+        meta: {
+            name: ''
+        ,   order: 32
+        ,   string: "ʰʼ"
+        }, features: {}
+    }
+]
+
 })();
