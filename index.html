@@ -46,6 +46,19 @@
             padding-right: 5px;
         }
 
+        /* make detail bar sticky, but let it scroll nicely if it's bigger than the viewport */
+        /* this means we have to set an explicit height on the nav els */
+        .nav {
+            height: 40px;
+        }
+        #detail { /* added by tabnav.js */
+            position: sticky;
+            top: 10px;
+            width: 100%;
+            max-height: calc(100vh - 60px); /* 40px for navs, 20px for body margin-top */
+            overflow: auto;
+        }
+
     </style>
 </head>
 <body>
