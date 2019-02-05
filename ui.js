@@ -157,7 +157,7 @@ function ethnologue_link(row, indices) {
 
 	var link = document.createElement('a');
 	
-	link.href = `http://ethnologue.com/language/${code}'`;
+	link.href = `http://ethnologue.com/language/${code}`;
 	link.textContent = ` (${code})`;
 	return link;
 }
