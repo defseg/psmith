@@ -11,6 +11,14 @@ psherlock.Query = function(contains=true, term='', num=null, gtlt='=') {
     this.kind = 'query';
 }
 
+psherlock.PropertyQuery = function(prop_name, prop_value, contains=true) {
+    // Queries on the table `languages` instead of `segments`.
+    this.prop_name = prop_name;
+    this.prop_value = prop_value;
+    this.contains = contains;
+    this.kind = 'propertyquery';
+}
+
 psherlock.QueryTree = function (left, relation, right) {
     this.left = left;
     this.relation = relation;
@@ -22,7 +30,6 @@ psherlock.SearchError = class SearchError extends Error {};
 
 psherlock.search = function (qtree) {
     var res = db.exec(build_sql(qtree));
-
     return res;
 }
 
@@ -77,6 +84,7 @@ psherlock.build_indices = function (results) {
 function build_sql(qtree) {
     // We go through the query tree twice - first to pull all the contains queries
     // so we can display the phonemes, and then to generate the actual SQL.
+    // The actual SQL is generated in get_sql().
     var phoneme_conditions = build_phoneme_conditions(qtree)
 
     // Special case: don't return any phonemes if it's an entirely negative query
@@ -113,6 +121,8 @@ function build_phoneme_conditions(qtree) {
             if (is_contains(node)) {
                 contains_queries.push(phoneme_condition(node.term));
             }
+        } else if (node.kind === 'propertyquery') {
+            // do nothing
         } else {
             throw new Psmith.psherlock.SearchError(`Bad query tree term ${node}`);
         }
@@ -172,6 +182,15 @@ function does_not_contain_query(term) {
         )`;
 }
 
+function prop_query(term) {
+    return `
+        languages.id ${term.contains ? '' : 'NOT'} IN (
+            SELECT languages.id 
+            FROM languages 
+            WHERE ${term.prop_name} = '${term.prop_value}'
+        )`;
+}
+
 function get_sql(q) {
     if (q.kind === 'tree') {
         return `(${get_sql(q.left)} ${q.relation} ${get_sql(q.right)})`;
@@ -182,6 +201,9 @@ function get_sql(q) {
         } else {
             return does_not_contain_query(q.term);
         }
+    }
+    if (q.kind === 'propertyquery') {
+        return prop_query(q);
     }
 }
 

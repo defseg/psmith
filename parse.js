@@ -38,8 +38,15 @@ psentence.parse = function parse(s) {
 			var relation = {'AND': 'AND', '&': 'AND', 'OR': 'OR', '|': 'OR'}[curr.toUpperCase()];
 			query_stack.push(new Psmith.psherlock.QueryTree(l, relation, r));
 			tokens.next();
+		} else if (is_property(tokens.peek())) {
+			var [prop_name, prop_value] = parse_property(tokens.next());
+			query_stack.push(new Psmith.psherlock.PropertyQuery(
+				prop_name
+			,	prop_value
+			,	true
+			));
 		} else {
-			throw new ParserError(`Invalid token ${curr}`);
+			throw new Psmith.psentence.ParserError(`Invalid token ${curr}`);
 		}
 	}
 	return query_stack[0]
@@ -79,6 +86,9 @@ function is_qualificand(s) {
 	var t = s.replace(/,/g, '');
 	return t.search(/[+-]+[a-z_]+/) == 0;
 }
+function is_property(s) {
+	return s.search(/\:/) > -1;
+}
 function is_phoneme(s) {
 	return s.search(/\/[^\/]+\//) == 0;
 }
@@ -113,5 +123,13 @@ function parse_qualificand(s) {
 		term[feature] = feature_vals;
 	}
 	return term;
+}
+function parse_property(s) {
+	if (s.split(':').length == 2) {
+		const arr = s.split(':');
+		return [arr[0], arr[1].replace('_',' ')]
+	} else {
+		throw new Psmith.psentence.ParserError(`Invalid property ${s}`);
+	}
 }
 })();
