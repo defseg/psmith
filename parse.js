@@ -127,7 +127,7 @@ function parse_qualificand(s) {
 function parse_property(s) {
 	if (s.split(':').length == 2) {
 		const arr = s.split(':');
-		return [arr[0], arr[1].replace('_',' ')]
+		return [arr[0], arr[1].replace(/_/g,' ')]
 	} else {
 		throw new Psmith.psentence.ParserError(`Invalid property ${s}`);
 	}

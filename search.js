@@ -187,7 +187,7 @@ function prop_query(term) {
         languages.id ${term.contains ? '' : 'NOT'} IN (
             SELECT languages.id 
             FROM languages 
-            WHERE ${term.prop_name} = '${term.prop_value}'
+            WHERE UPPER(${term.prop_name}) = UPPER('${term.prop_value}')
         )`;
 }
 
