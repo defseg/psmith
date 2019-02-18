@@ -34,11 +34,11 @@
         if (this.tabs.has(name)) return;
 
         var new_el = document.createElement('div');
+        new_el.id = name.toLowerCase();
         new_el.className = 'hidden';
 
         this.container_el.appendChild(new_el);
         this.tabs.set(name, new_el);
-
         this.add_nav(name, new_el);
     }
 
