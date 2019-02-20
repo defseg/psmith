@@ -111,7 +111,7 @@
 
                     <p>To search for multiple feature values on the same phoneme, separate the feature components with a semicolon. For example, <code>any +syllabic;+consonantal</code> will return a list of doculects with syllabic consonants.</p>
 
-                    <p>To limit the search to languages with specific properties, use <code>field:value</code>, or the negation <code>field:!value</code>. For example, <code>no -sonorant;+delayed_release !country:australia and</code> will return all doculects that do not contain non-glottal fricatives and are spoken outside Australia.</p>
+                    <p>To limit the search to languages with specific properties, use <code>field:value</code>. To limit the search to languages <em>without</em> specific properties, use <code>!field:value</code>. Values are case-insensitive. For example, <code>country:australia</code> will return all doculects that PHOIBLE lists as spoken in Australia. Spaces in the value must be replaced with underscores, as in <code>country:united_states</code>.</p>
 
                     <p>Search terms may be joined by the logical operators <code>and</code> and <code>or</code>. These are postfix.</p>
 
@@ -147,6 +147,22 @@
                     <p>Find doculects with /ʰd/ and no /m/</p>
                     <pre><code>/ʰd/ no /m/ and
                         Hoti
+                    </code></pre>
+                    <p>Find doculects with no non-glottal fricatives spoken outside Australia</p>
+                    <pre><code>no -sonorant;+delayed_release !country:australia and
+                        Auyana
+                        Nasioi
+                        (etc. - 19 results)
+                    </code></pre>
+                    <p>Find doculects with no labial plosives spoken in the United States</p>
+                    <pre><code>no +consonantal;+labial;-dorsal;-continuant;-sonorant country:united_states and
+                        Wichita
+                        ALEUT
+                        CHEROKEE
+                        EYAK
+                        WICHITA
+                        Huron
+                        Tanacross
                     </code></pre>
 
                     <h3>List of features</h3>
