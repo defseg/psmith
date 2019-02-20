@@ -39,11 +39,11 @@ psentence.parse = function parse(s) {
 			query_stack.push(new Psmith.psherlock.QueryTree(l, relation, r));
 			tokens.next();
 		} else if (is_property(tokens.peek())) {
-			var [prop_name, prop_value] = parse_property(tokens.next());
+			var [prop_name, prop_value, contains] = parse_property(tokens.next());
 			query_stack.push(new Psmith.psherlock.PropertyQuery(
 				prop_name
 			,	prop_value
-			,	true
+			,	contains
 			));
 		} else {
 			throw new Psmith.psentence.ParserError(`Invalid token ${curr}`);
@@ -126,8 +126,13 @@ function parse_qualificand(s) {
 }
 function parse_property(s) {
 	if (s.split(':').length == 2) {
-		const arr = s.split(':');
-		return [arr[0], arr[1].replace(/_/g,' ')]
+		var arr = s.split(':');
+		var contains = true;
+		if (arr[0][0] === '!') {
+			contains = false;
+			arr[0] = arr[0].slice(1);
+		}
+		return [arr[0], arr[1].replace(/_/g,' '), contains]
 	} else {
 		throw new Psmith.psentence.ParserError(`Invalid property ${s}`);
 	}
