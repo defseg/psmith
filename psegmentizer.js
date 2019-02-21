@@ -47,26 +47,21 @@ function build_grid(phonemes) {
 
     // Now sort them and initialize the grid
     var comparem = (a, b) => a.order - b.order;
-    var mappem   = x => x.name;
-    xs = [...xs].sort(comparem).map(mappem);
-    ys = [...ys].sort(comparem).map(mappem);
+    xs = [...xs].sort(comparem).map(get_name);
+    ys = [...ys].sort(comparem).map(get_name);
 
-    var phoneme_matrix = new PhonemeMatrix(ys, xs);
-    
-    // Second iteration over phonemes: populate the grid
-    for (let p of phonemes) {
-        var foo = get_y_x(p).map(mappem)
-        phoneme_matrix.push(foo[0],foo[1], p);
-    }
+    var phoneme_matrix = new PhonemeMatrix(ys, xs, phonemes);
 
     return phoneme_matrix
 }
+
+function get_name(x) { return x.name };
 
 // ------------------------------------
 // -- PhonemeMatrix and PhonemeArray --
 // ------------------------------------
 
-function PhonemeMatrix(ys, xs) {
+function PhonemeMatrix(ys, xs, phonemes) {
     this.map = new Map();
     this.y_headers = [];
     this.x_headers = [];
@@ -81,9 +76,41 @@ function PhonemeMatrix(ys, xs) {
             this.map.get(y).set(x, []); // TODO: should this be a set? Then we'd just sort them later.
         }
     }
+
+    for (let p of phonemes) {
+        let foo = get_y_x(p).map(get_name);
+        this.push(foo[0], foo[1], p)
+    }
+
+    // Compress the chart to avoid unneeded columns.
+    // For now, this will just handle labiodental fricatives and /w/.
+    // Eventually it should be generalized, to handle things like palatal /ʃ/ (Cham, MABA, Koalib, Krongo, Kanga (Kanga))
+    // and dental plosives + alveolar everything else (Manange).
+    // It also can't handle /j/ yet, and should be able to do that.
+    // TODO
+
+    // temp function for this big hairy if statement
+    // later we'll iterate through everything probably
+    let should_merge = (moa, poa_from, poa_into) => {
+        return this.count_x(poa_from) > 0 &&
+               this.count_x(poa_from) === this.get_size(moa, poa_from) &&
+               this.get_size(moa, poa_into) === 0; 
+    }
+
+    if (should_merge('fricative', 'labiodental', 'labial')) {
+        this.merge_x('labiodental', 'labial');
+    }
+    if (should_merge('resonant', 'rounded velar', 'velar')) {
+        this.merge_x('rounded velar', 'velar');
+    }
 }
 PhonemeMatrix.prototype.get = function (y, x) {
     return this.map.get(y).get(x);
+}
+PhonemeMatrix.prototype.get_size = function (y, x) {
+    if (!this.map.has(y)) return 0;
+    if (!this.map.get(y).has(x)) return 0;
+    return this.get(y, x).length;
 }
 PhonemeMatrix.prototype.push = function (y, x, foo) {
     this.get(y, x).push(foo);
@@ -91,17 +118,23 @@ PhonemeMatrix.prototype.push = function (y, x, foo) {
 }
 PhonemeMatrix.prototype.count_y = function (y) {
     // Return the number of distinct phonemes in a chart row.
+    if (!this.map.has(y)) return 0;
     return [...this.map.get(y).entries()].reduce((acc, cur) => acc + cur[1].length, 0)
 }
 PhonemeMatrix.prototype.count_x = function (x) {
     // Return the number of distinct phonemes in a chart column.
+    if (this.x_headers.indexOf(x) === -1) return 0;
     return [...this.map.entries()].reduce((acc, cur) => acc + cur[1].get(x).length, 0)
-}
-PhonemeMatrix.prototype.merge_columns = function (merge_from, merge_into) {
-    // TODO
 }
 PhonemeMatrix.prototype.is_not_empty = function (y) {
     return this._size > 0;
+}
+PhonemeMatrix.prototype.merge_x = function (from, into) {
+    // Merge `from` into `into`, and then delete `from`.
+    for (var [y_key, x] of this.map) {
+        x.set(into, x.get(into).concat(x.get(from)));
+        x.delete(from);
+    } 
 }
 PhonemeMatrix.prototype.size = function () { // Seems easier than tracking a size attr in PhonemeArray
     return this._size;
