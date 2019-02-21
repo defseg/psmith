@@ -550,6 +550,13 @@ features.place_and_secondary_articulation = [
         }]
     }, {
         meta: {
+            name: 'epiglottal',
+            order: 39.5
+        }, features: [{
+            'epilaryngeal_source': '+'
+        }]
+    }, {
+        meta: {
             name: 'glottal',
             order: 40,
         }, features: [{ // No features - we get this with string processing, for reasons I forget.
