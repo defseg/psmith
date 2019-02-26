@@ -235,6 +235,9 @@ function vowel_info(segment) {
         height = get_by_name('height', 'high');
         frontness = get_by_name('frontness', 'central')
     }
+    if (seg.indexOf('ə') === 0) { // schwa is typically considered a mid vowel; here it's conflated with 3
+        height = get_by_name('height', 'mid');
+    }
 
     // TODO
     return {
