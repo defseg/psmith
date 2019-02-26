@@ -13,6 +13,7 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
     var clicks = []; // Yes, these are consonants, but they need a separate table. Like lanthanides and actinides.
     var vowels = [];
     var tones = [];
+    var syllabic_consonants = [];
     var unknowns = [];
 
     mapped.forEach(x => {
@@ -24,11 +25,16 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
             vowels.push(x)
         } else if (x && x.klass === 'tone') {
             tones.push(x);
+        } else if (x && x.klass === 'syllabic_consonant') {
+            syllabic_consonants.push(x);
+        } else {
+            unknowns.push(x);
         }
     });
     return {
         'consonants': new PhonemeMatrix(consonants, 'consonant'),
         'clicks': new PhonemeMatrix(clicks, 'click'),
+        'syllabic_consonants': new PhonemeArray(syllabic_consonants),
         'vowels': new PhonemeMatrix(vowels, 'vowel'), // TODO make a nice grid for these too
         'tones': new PhonemeArray(tones)
     }
@@ -88,6 +94,7 @@ function PhonemeMatrix(phonemes, phoneme_klass) {
         // later we'll iterate through everything probably
         let should_merge = (moa, poa_from, poa_into) => {
             return this.count_x(poa_from) > 0 &&
+                   this.count_x(poa_into) > 0 &&
                    this.count_x(poa_from) === this.get_size(moa, poa_from) &&
                    this.get_size(moa, poa_into) === 0; 
         }
@@ -173,8 +180,9 @@ PhonemeMatrix.prototype.order = function (a, b) {
     }
     if (this.phoneme_klass === 'vowel') {
         return order_segments(a, b, [
-            'roundness'
-        ]); // TODO   
+                'length'
+            ,   'roundness'
+            ]); // TODO   
     }
 }
 
@@ -196,7 +204,14 @@ PhonemeArray.prototype.size = function () {
 function segment_info(segment) {
     // vowels
     if (segment.syllabic !== '-' && segment.consonantal === '-') return vowel_info(segment);
-    if (segment.syllabic && segment.syllabic.indexOf(',') > -1) return vowel_info(segment); // aj, aw etc. - erroneous diphthongs
+    // fricated vowels
+    if (segment.syllabic === '+' && segment.consonantal === '+' && segment.segment.indexOf('\u0353') > -1) return vowel_info(segment);
+    // erroneous diphthongs (aj, aw, etc.)
+    if (segment.syllabic && segment.syllabic.indexOf(',') > -1) return vowel_info(segment);
+    // Weird notation for fricated vowels in SPA inventories
+    if (segment.syllabic === '+' && segment.segment.indexOf('z̞̩') > -1) return vowel_info(segment);
+    // syllabic consonants
+    if (segment.syllabic === '+' && segment.consonantal === '+') return consonant_info(segment, true);
 
     // tones
     if (segment.tone === '+') return tone_info(segment);
@@ -216,6 +231,10 @@ function vowel_info(segment) {
     // Errata
     const seg = segment.segment;
     if (seg === 'ɯ̞') height = get_by_name('height', 'high-mid');
+    if (seg.indexOf('z̞̩') > -1) { // treat 'apical vowels' as high central
+        height = get_by_name('height', 'high');
+        frontness = get_by_name('frontness', 'central')
+    }
 
     // TODO
     return {
@@ -223,7 +242,8 @@ function vowel_info(segment) {
     ,   klass: 'vowel'
     ,   height: height
     ,   frontness: frontness
-    ,   roundness: roundness
+    ,   roundness: get('roundness', segment)
+    ,   length: get('duration', segment)
     }
 }
 
@@ -235,10 +255,10 @@ function tone_info(segment) {
     }
 }
 
-function consonant_info(segment, is_click = false) {
+function consonant_info(segment, is_syllabic = false) {
     return {
         phoneme: segment.segment
-    ,   klass: 'consonant'
+    ,   klass: is_syllabic ? 'syllabic_consonant' : 'consonant'
     ,   place: get_place_and_secondary_articulation(segment)
     ,   pharyngeal_configuration: get('pharyngeal_configuration', segment)
     ,   manner: get('manner', segment)
