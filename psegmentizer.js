@@ -27,32 +27,11 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
         }
     });
     return {
-        'consonants': build_grid(consonants),
-        'clicks': build_grid(clicks),
+        'consonants': new PhonemeMatrix(consonants, 'consonant'),
+        'clicks': new PhonemeMatrix(clicks, 'click'),
         'vowels': new PhonemeArray(vowels), // TODO make a nice grid for these too
         'tones': new PhonemeArray(tones)
     }
-}
-
-function build_grid(phonemes) {
-    var ys = new Set();
-    var xs = new Set();
-
-    // First iteration over phonemes: build X and Y axes
-    for (let p of phonemes) {
-        let [y, x] = get_y_x(p);
-        ys.add(y);
-        xs.add(x);
-    }
-
-    // Now sort them and initialize the grid
-    var comparem = (a, b) => a.order - b.order;
-    xs = [...xs].sort(comparem).map(get_name);
-    ys = [...ys].sort(comparem).map(get_name);
-
-    var phoneme_matrix = new PhonemeMatrix(ys, xs, phonemes);
-
-    return phoneme_matrix
 }
 
 function get_name(x) { return x.name };
@@ -61,7 +40,22 @@ function get_name(x) { return x.name };
 // -- PhonemeMatrix and PhonemeArray --
 // ------------------------------------
 
-function PhonemeMatrix(ys, xs, phonemes) {
+function PhonemeMatrix(phonemes, phoneme_klass) {
+    var ys = new Set();
+    var xs = new Set();
+
+    this.phoneme_klass = phoneme_klass; // 'consonant', 'click', or 'vowel'
+
+    for (let p of phonemes) {
+        let [y, x] = this.get_y_x(p);
+        ys.add(y);
+        xs.add(x);
+    }
+
+    var comparem = (a, b) => a.order - b.order;
+    xs = [...xs].sort(comparem).map(get_name);
+    ys = [...ys].sort(comparem).map(get_name);
+
     this.map = new Map();
     this.y_headers = [];
     this.x_headers = [];
@@ -78,30 +72,32 @@ function PhonemeMatrix(ys, xs, phonemes) {
     }
 
     for (let p of phonemes) {
-        let foo = get_y_x(p).map(get_name);
+        let foo = this.get_y_x(p).map(get_name);
         this.push(foo[0], foo[1], p)
     }
 
-    // Compress the chart to avoid unneeded columns.
-    // For now, this will just handle labiodental fricatives and /w/.
-    // Eventually it should be generalized, to handle things like palatal /ʃ/ (Cham, MABA, Koalib, Krongo, Kanga (Kanga))
-    // and dental plosives + alveolar everything else (Manange).
-    // It also can't handle /j/ yet, and should be able to do that.
-    // TODO
+    if (this.phoneme_klass === 'consonant') {
+        // Compress the chart to avoid unneeded columns.
+        // For now, this will just handle labiodental fricatives and /w/.
+        // Eventually it should be generalized, to handle things like palatal /ʃ/ (Cham, MABA, Koalib, Krongo, Kanga (Kanga))
+        // and dental plosives + alveolar everything else (Manange).
+        // It also can't handle /j/ yet, and should be able to do that.
+        // TODO
 
-    // temp function for this big hairy if statement
-    // later we'll iterate through everything probably
-    let should_merge = (moa, poa_from, poa_into) => {
-        return this.count_x(poa_from) > 0 &&
-               this.count_x(poa_from) === this.get_size(moa, poa_from) &&
-               this.get_size(moa, poa_into) === 0; 
-    }
+        // temp function for this big hairy if statement
+        // later we'll iterate through everything probably
+        let should_merge = (moa, poa_from, poa_into) => {
+            return this.count_x(poa_from) > 0 &&
+                   this.count_x(poa_from) === this.get_size(moa, poa_from) &&
+                   this.get_size(moa, poa_into) === 0; 
+        }
 
-    if (should_merge('fricative', 'labiodental', 'labial')) {
-        this.merge_x('labiodental', 'labial');
-    }
-    if (should_merge('resonant', 'rounded velar', 'velar')) {
-        this.merge_x('rounded velar', 'velar');
+        if (should_merge('fricative', 'labiodental', 'labial')) {
+            this.merge_x('labiodental', 'labial');
+        }
+        if (should_merge('resonant', 'rounded velar', 'velar')) {
+            this.merge_x('rounded velar', 'velar');
+        }
     }
 }
 PhonemeMatrix.prototype.get = function (y, x) {
@@ -153,12 +149,31 @@ PhonemeMatrix.prototype.to_html = function () {
         // res += `<th>${y_header}</th>`;
         for (let x of y_contents.entries()) {
             var [x_header, x_contents] = x;
-            res += `<td>${x_contents.sort(order_consonants).map(i => i.phoneme).join(' ')}</td>`;
+            res += `<td>${x_contents.sort(this.order).map(i => i.phoneme).join(' ')}</td>`;
         }
         res += '</tr>';
     }
     res += '</table>';
     return res;
+}
+PhonemeMatrix.prototype.get_y_x = function (p) {
+    // Get whatever features are used for the y and x axes on this grid.
+    if (this.phoneme_klass === 'consonant' || this.phoneme_klass === 'click') return [p.manner, p.place];
+    if (this.phoneme_klass === 'vowel') throw new Error('TODO: get_y_x for vowels');
+}
+PhonemeMatrix.prototype.order = function (a, b) {
+    if (this.phoneme_klass === 'consonant' || this.phoneme_klass === 'click') {
+        return order_segments(a, b, [
+                'voicing'
+            ,   'pharyngeal_configuration'
+            ,   'airstream_mechanism'
+            ,   'duration'
+            ,   'strength'
+            ]);
+    }
+    if (this.phoneme_klass === 'vowel') {
+        return order_segments(a, b, []); // TODO   
+    }
 }
 
 // We want tones to also have a to_html, so we'll make a one-dimensional array too. TODO test this
@@ -170,11 +185,6 @@ PhonemeArray.prototype.to_html = function () {
 }
 PhonemeArray.prototype.size = function () {
     return this.phonemes.length;
-}
-
-function get_y_x(phoneme) {
-    if (phoneme.klass === 'consonant' || phoneme.klass === 'click') return [phoneme.manner, phoneme.place];
-    throw new Error('TODO: get_x_y for vowels');
 }
 
 // -------------------------
@@ -345,15 +355,7 @@ function test(segment, foo_oa) {
     return false;
 }
 
-function order_consonants(a, b) {
-    var feature_order = [
-        'voicing'
-    ,   'pharyngeal_configuration'
-    ,   'airstream_mechanism'
-    ,   'duration'
-    ,   'strength'
-    ];
-
+function order_segments(a, b, feature_order) {
     for (let f of feature_order) {
         if (!a.hasOwnProperty(f) || !b.hasOwnProperty(f) || !a[f].hasOwnProperty('order') 
             || !b[f].hasOwnProperty('order')) {continue};
