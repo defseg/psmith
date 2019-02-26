@@ -81,7 +81,11 @@ UI.language_detail = function (res) {
 
 	var el_html = `
 	<h3 class='language-name'>${info.language_name} (${info.source})</h3>
-
+		<div class='language-phoible'>
+			<a href="https://phoible.org/inventories/view/${info.inventory_id}">
+				View on phoible.org
+			</a>
+		</div>
 		<div class='language-family'>Family: ${info.language_family_genus}</div>
 		<div class='language-code'>ISO 639-3: 
 			<a href='https://www.ethnologue.com/language/${info.language_code}'>
@@ -115,7 +119,7 @@ UI.language_detail = function (res) {
 
 function language_template(row, indices) {
 	var language_el = document.createElement('tr');
-	var columns = [detail_link, ethnologue_link, phoneme_display];
+	var columns = [detail_link, phoible_link, ethnologue_link, phoneme_display];
 	columns.forEach(f => {
 		var td = document.createElement('td');
 		td.appendChild(f(row, indices));
@@ -148,7 +152,7 @@ function phoible_link(row, indices) {
 	var link = document.createElement('a')
 
 	link.href = `http://phoible.org/inventories/view/${id}`
-	link.textContent = name;
+	link.innerText = row[indices['source']];
 	return link;
 }
 

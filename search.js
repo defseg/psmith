@@ -100,7 +100,7 @@ function build_sql(qtree) {
     if (is_negative(qtree)) do_phonemes = false;
 
     return `
-        SELECT languages.id, languages.language_name, languages.language_code${do_phonemes ? ', ' + do_phonemes : ''}
+        SELECT languages.id, languages.language_name, languages.source, languages.language_code${do_phonemes ? ', ' + do_phonemes : ''}
         FROM languages
         JOIN language_phonemes ON languages.id = language_phonemes.language_id
         JOIN phonemes ON language_phonemes.phoneme_id = phonemes.id
