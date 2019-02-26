@@ -1091,7 +1091,11 @@ features.strength = [
     }
 ]
 
-// Click stuff. Doesn't use features - PHOIBLE's featural decomposition of clicks is Not Good.
+// ------------
+// -- Clicks --
+// ------------
+
+// This doesn't use features - PHOIBLE's featural decomposition of clicks is Not Good.
 // So it's all string processing. Check psegmentizer.js.
 features.click_precomponent = [
     {
@@ -1170,8 +1174,8 @@ features.click_precomponent = [
 ];
 
 // These were all automatically generated, so there are no names for now. (TODO?)
-// The diacritics   (COMBINING X BELOW) and ... have been removed.
-// They don't appear to be load-bearing - languages either have them on an entire series or don't.
+// The diacritic   (COMBINING X BELOW), which marks frication, has been removed.
+// No PHOIBLE doculect contrasts fricated and non-fricated clicks at the same POA.
 features.click_efflux = [ 
     {
         meta: {
@@ -1359,6 +1363,75 @@ features.click_efflux = [
         ,   order: 32
         ,   string: "ʰʼ"
         }, features: {}
+    }
+]
+
+// ------------
+// -- Vowels --
+// ------------
+
+features.height = [
+    {
+        meta: {name: 'high', order: 0}, features: [{
+            'high':  '+'
+        ,   'low':   '-'
+        ,   'tense': '+'
+        }]
+    }, {
+        meta: {name: 'high-mid', order: 1}, features: [{
+            'high':  '+'
+        ,   'low':   '-'
+        ,   'tense': '-'
+        }]
+    }, {
+        meta: {name: 'mid', order: 2}, features: [{
+            'high':  '-'
+        ,   'low':   '-'
+        ,   'tense': '+'
+        }]
+    }, {
+        meta: {name: 'low-mid', order: 3}, features: [{
+            'high':  '-'
+        ,   'low':   '-'
+        ,   'tense': '-'
+        }]
+    }, {
+        meta: {name: 'low', order: 4}, features: [{
+            'high':  '-'
+        ,   'low':   '+'
+        }]
+    }
+]
+
+features.frontness = [
+    {
+        meta: {name: 'front', order: 0}, features: [{
+            'front': '+'
+        ,   'back':  '-'
+        }]
+    }, {
+        meta: {name: 'central', order: 1}, features: [{
+            'front': '-'
+        ,   'back':  '-'
+        }]
+    }, {
+        meta: {name: 'back', order: 2}, features: [{
+            'front': '-'
+        ,   'back':  '+'
+        }]
+    }
+]
+
+features.roundness = [
+    {
+        meta: {name: 'unrounded', order: 0}, features: [{
+            'labial': '-'
+        }]
+    }, {
+        meta: {name: 'rounded', order: 1}, features: [{
+            'labial': '+'
+        ,   'round':  '+'
+        }]
     }
 ]
 

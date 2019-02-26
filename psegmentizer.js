@@ -29,7 +29,7 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
     return {
         'consonants': new PhonemeMatrix(consonants, 'consonant'),
         'clicks': new PhonemeMatrix(clicks, 'click'),
-        'vowels': new PhonemeArray(vowels), // TODO make a nice grid for these too
+        'vowels': new PhonemeMatrix(vowels, 'vowel'), // TODO make a nice grid for these too
         'tones': new PhonemeArray(tones)
     }
 }
@@ -149,7 +149,7 @@ PhonemeMatrix.prototype.to_html = function () {
         // res += `<th>${y_header}</th>`;
         for (let x of y_contents.entries()) {
             var [x_header, x_contents] = x;
-            res += `<td>${x_contents.sort(this.order).map(i => i.phoneme).join(' ')}</td>`;
+            res += `<td>${x_contents.sort(this.order.bind(this)).map(i => i.phoneme).join(' ')}</td>`;
         }
         res += '</tr>';
     }
@@ -159,7 +159,7 @@ PhonemeMatrix.prototype.to_html = function () {
 PhonemeMatrix.prototype.get_y_x = function (p) {
     // Get whatever features are used for the y and x axes on this grid.
     if (this.phoneme_klass === 'consonant' || this.phoneme_klass === 'click') return [p.manner, p.place];
-    if (this.phoneme_klass === 'vowel') throw new Error('TODO: get_y_x for vowels');
+    if (this.phoneme_klass === 'vowel') return [p.height, p.frontness];
 }
 PhonemeMatrix.prototype.order = function (a, b) {
     if (this.phoneme_klass === 'consonant' || this.phoneme_klass === 'click') {
@@ -172,7 +172,9 @@ PhonemeMatrix.prototype.order = function (a, b) {
             ]);
     }
     if (this.phoneme_klass === 'vowel') {
-        return order_segments(a, b, []); // TODO   
+        return order_segments(a, b, [
+            'roundness'
+        ]); // TODO   
     }
 }
 
@@ -207,10 +209,21 @@ function segment_info(segment) {
 }
 
 function vowel_info(segment) {
+    let height = get('height', segment);
+    let frontness = get('frontness', segment);
+    let roundness = get('roundness', segment);
+
+    // Errata
+    const seg = segment.segment;
+    if (seg === 'ɯ̞') height = get_by_name('height', 'high-mid');
+
     // TODO
     return {
         phoneme: segment.segment
     ,   klass: 'vowel'
+    ,   height: height
+    ,   frontness: frontness
+    ,   roundness: roundness
     }
 }
 
