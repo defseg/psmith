@@ -182,6 +182,7 @@ PhonemeMatrix.prototype.order = function (a, b) {
         return order_segments(a, b, [
                 'length'
             ,   'roundness'
+            ,   'nasality'
             ]); // TODO   
     }
 }
@@ -247,6 +248,7 @@ function vowel_info(segment) {
     ,   frontness: frontness
     ,   roundness: get('roundness', segment)
     ,   length: get('duration', segment)
+    ,   nasality: get('nasality', segment)
     }
 }
 
@@ -399,12 +401,10 @@ function order_segments(a, b, feature_order) {
         if (a[f].order > b[f].order) return 1;
     }
 
-    return lexicographic_order(a, b);
+    return lexicographic_order(a.phoneme, b.phoneme);
 }
 
 function lexicographic_order(a, b) {
-    if (a > b) return -1;
-    if (a < b) return 1;
-    return 0;
+    return a.localeCompare(b);
 }
 })();

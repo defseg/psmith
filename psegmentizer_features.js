@@ -1435,4 +1435,12 @@ features.roundness = [
     }
 ]
 
+features.nasality = [
+    {
+        meta: {name: 'oral', order: 0}, features: [{ 'nasal': '-' }]
+    }, {
+        meta: {name: 'nasal', order: 1}, features: [{ 'nasal': '+' }]
+    }
+]
+
 })();
