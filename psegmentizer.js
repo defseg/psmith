@@ -230,7 +230,7 @@ function vowel_info(segment) {
 
     // Errata
     const seg = segment.segment;
-    if (seg === 'ɯ̞') height = get_by_name('height', 'high-mid');
+    if (seg.indexOf('ɯ̞') > -1) height = get_by_name('height', 'high-mid');
     if (seg.indexOf('z̞̩') > -1) { // treat 'apical vowels' as high central
         height = get_by_name('height', 'high');
         frontness = get_by_name('frontness', 'central')
