@@ -14,6 +14,7 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
     var vowels = [];
     var tones = [];
     var syllabic_consonants = [];
+    var diphthongs = [];
     var unknowns = [];
 
     mapped.forEach(x => {
@@ -27,6 +28,8 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
             tones.push(x);
         } else if (x && x.klass === 'syllabic_consonant') {
             syllabic_consonants.push(x);
+        } else if (x && x.klass === 'diphthong') {
+            diphthongs.push(x);
         } else {
             unknowns.push(x);
         }
@@ -36,6 +39,7 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
         'clicks': new PhonemeMatrix(clicks, 'click'),
         'syllabic_consonants': new PhonemeArray(syllabic_consonants),
         'vowels': new PhonemeMatrix(vowels, 'vowel'), // TODO make a nice grid for these too
+        'diphthongs': new PhonemeArray(diphthongs),
         'tones': new PhonemeArray(tones)
     }
 }
@@ -180,9 +184,9 @@ PhonemeMatrix.prototype.order = function (a, b) {
     }
     if (this.phoneme_klass === 'vowel') {
         return order_segments(a, b, [
-                'length'
-            ,   'roundness'
+                'roundness'
             ,   'nasality'
+            ,   'length'
             ]); // TODO   
     }
 }
@@ -204,11 +208,16 @@ PhonemeArray.prototype.size = function () {
 
 function segment_info(segment) {
     // vowels
-    if (segment.syllabic !== '-' && segment.consonantal === '-') return vowel_info(segment);
+    if (segment.syllabic !== '-' && segment.consonantal === '-') {
+        // diphthongs
+        if ([segment.front, segment.back, segment.high, segment.low, segment.tense].some(x => x && x.indexOf(',') > -1)) return vowel_info(segment, true); 
+        // monophthongs
+        return vowel_info(segment);
+    }
     // fricated vowels
     if (segment.syllabic === '+' && segment.consonantal === '+' && segment.segment.indexOf('\u0353') > -1) return vowel_info(segment);
     // erroneous diphthongs (aj, aw, etc.)
-    if (segment.syllabic && segment.syllabic.indexOf(',') > -1) return vowel_info(segment);
+    if (segment.syllabic && segment.syllabic.indexOf(',') > -1) return vowel_info(segment, true);
     // Weird notation for fricated vowels in SPA inventories
     if (segment.syllabic === '+' && segment.segment.indexOf('z̞̩') > -1) return vowel_info(segment);
     // syllabic consonants
@@ -224,7 +233,7 @@ function segment_info(segment) {
     return consonant_info(segment);
 }
 
-function vowel_info(segment) {
+function vowel_info(segment, is_diphthong = false) {
     let height = get('height', segment);
     let frontness = get('frontness', segment);
     let roundness = get('roundness', segment);
@@ -243,7 +252,7 @@ function vowel_info(segment) {
     // TODO
     return {
         phoneme: segment.segment
-    ,   klass: 'vowel'
+    ,   klass: is_diphthong ? 'diphthong' : 'vowel'
     ,   height: height
     ,   frontness: frontness
     ,   roundness: get('roundness', segment)

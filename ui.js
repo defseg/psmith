@@ -103,6 +103,11 @@ UI.language_detail = function (res) {
 	el_html += `<h4 class='language-segments'>Vowels (${segments.vowels.size()})</h4>
 	${segments.vowels.to_html()}`
 
+	if (segments.diphthongs.size() > 0) {
+		el_html += `<h4 class='language-segments'>Diphthongs (${segments.diphthongs.size()})</h4>
+		${segments.diphthongs.to_html()}`;
+	}
+
 	if (segments.syllabic_consonants.size() > 0) {
 		el_html += `<h4 class='language-segments'>Syllabic consonants (${segments.syllabic_consonants.size()})</h4>
 		${segments.syllabic_consonants.to_html()}`;
