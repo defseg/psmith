@@ -660,7 +660,7 @@ features.manner = [ // TODO: any more prenasalized consonants need fixed?
             order: 1
         }, features: [{ // PHOIBLE is wrong. These aren't nasalized. They nasalize following V.
             'consonantal':     '+' // Except for the nasalized clicks, which are nasalized.
-        ,   'sonorant':        '-' // TODO: separate grid for clicks
+        ,   'sonorant':        '-' 
         ,   'continuant':      '-'
         ,   'delayed_release': '-'
         ,   'approximant':     '-'

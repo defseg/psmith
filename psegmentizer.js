@@ -1,8 +1,7 @@
 (function () {
 if (typeof window.Psmith === 'undefined') window.Psmith = {}; 
 if (typeof window.Psmith.psegmentizer === 'undefined') window.Psmith.psegmentizer = {};
-// TODO:
-// - do vowel stuff
+
 window.Psmith.psegmentizer.psegmentize = function (segments) {
     // Pass in the raw results of get_inventory.
 
@@ -147,7 +146,6 @@ PhonemeMatrix.prototype.size = function () { // Seems easier than tracking a siz
     return this._size;
 }
 PhonemeMatrix.prototype.to_html = function () {
-    // just build a string for now. TODO maybe do it right (build nodes) later
     var res = '<table class=\'inventory\'>';
     
     // need to build x headers first
@@ -249,7 +247,8 @@ function vowel_info(segment, is_diphthong = false) {
         height = get_by_name('height', 'mid');
     }
 
-    // TODO
+    // TODO more features? (phonation, etc.)
+
     return {
         phoneme: segment.segment
     ,   klass: is_diphthong ? 'diphthong' : 'vowel'
@@ -262,7 +261,6 @@ function vowel_info(segment, is_diphthong = false) {
 }
 
 function tone_info(segment) {
-    // TODO?
     return {
         phoneme: segment.segment
     ,   klass: 'tone'
@@ -356,7 +354,6 @@ function click_info(segment) {
 
 function get_place_and_secondary_articulation(segment) {
     var seg = segment.segment;
-    // TODO also epiglottals.
 
     // Glottals are hard
     if (seg[0] === 'h' || seg[0] === 'ʔ' || seg[0] === 'ɦ') return get_by_name('place_and_secondary_articulation', 'glottal');

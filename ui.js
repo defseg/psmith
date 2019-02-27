@@ -147,7 +147,7 @@ function detail_link(row, indices) {
 	// dataset is slow and has poor cross-browser performance
 	link.setAttribute('data-id', id);
 	link.textContent = name;
-	link.setAttribute('tabindex', '0'); // TODO: these should be real links with hrefs and all. need to get detail URL handling first tho
+	link.setAttribute('tabindex', '0');
 
 	// bind the event
 	link.onclick = detail;

@@ -52,10 +52,6 @@ psherlock.get_language_info = function (id) {
 // -----------
 
 psherlock.indexify = function (results) {
-    return _indexify(results.values, build_indices(results));
-}
-
-psherlock.indexify = function (results) {
     var values = results.values;
     var indices = psherlock.build_indices(results);
     var new_results = [];
