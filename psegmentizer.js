@@ -38,8 +38,8 @@ window.Psmith.psegmentizer.psegmentize = function (segments) {
         'consonants': new PhonemeMatrix(consonants, 'consonant'),
         'clicks': new PhonemeMatrix(clicks, 'click'),
         'syllabic_consonants': new PhonemeArray(syllabic_consonants),
-        'vowels': new PhonemeMatrix(vowels, 'vowel'), // TODO make a nice grid for these too
-        'diphthongs': new PhonemeArray(diphthongs),
+        'vowels': new PhonemeMatrix(vowels, 'vowel'),
+        'diphthongs': new PhonemeMatrix(diphthongs, 'vowel'),
         'tones': new PhonemeArray(tones)
     }
 }
@@ -331,7 +331,7 @@ function click_info(segment) {
 
     var seg = segment.segment.replace(/ǃǃ/,'‼'); // Make this a single character so the regex is simpler.
     seg = seg.replace(/ǃ̠/,'‼'); // This looks like a POA.
-    seg = seg.replace(/[\u0353]/,''); // Discard apparently spurious diacritics.
+    seg = seg.replace(/[\u0353]/,''); // Discard frication diacritic - it's not contrastive, and this simplifies things.
     seg = seg.replace('ǂˡ','ǁ') // Alternate notation for the lateral click in !Xu.
     seg = seg.replace('ʼʰ', 'ʰʼ') // Fix !Xun
     var [_, precomponent, influx, efflux] = split_regex.exec(seg);
