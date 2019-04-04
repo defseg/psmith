@@ -4,11 +4,7 @@ Psmith is a search tool for the [PHOIBLE](https://phoible.org) linguistic databa
 
 # Which version of PHOIBLE does Psmith use?
 
-The [CLLD release](https://github.com/clld/phoible). It should probably use a [dev release](https://github.com/phoible/dev), but it doesn't yet.
-
-# How do I use Psmith?
-
-With caution and willingness to click through and check the sources. 
+The [CLLD release](https://github.com/clld/phoible), for now; soon it will use PHOIBLE 2.0.
 
 # How do I write a search query?
 
@@ -24,6 +20,16 @@ For the numeric component of the feature term, `no` can be used to mean `0`, and
 
 To search for multiple feature values on the same phoneme, separate the feature components with a semicolon. For example, `any +syllabic;+consonantal` will return a list of doculects with syllabic consonants.
 
-To limit the search to languages with specific properties, use `field:value` syntax. To limit the search to languages without specific properties, use `!field:value`. Values are case-insensitive. For example, `country:australia` will return all doculects that PHOIBLE lists as spoken in Australia. Spaces in the value must be replaced with underscores, as in `country:united_states`. The available fields are listed here.
+To limit the search to languages with specific properties, use `field:value` syntax. To limit the search to languages without specific properties, use `!field:value`. Values are case-insensitive. For example, `country:australia` will return all doculects that PHOIBLE lists as spoken in Australia. Spaces in the value must be replaced with underscores, as in `country:united_states`. The available fields are:
+
+- `source`: The contributor of the inventory.
+- `language_code`: The ISO 639-3 code of the language.
+- `language_name`: The name of the language according to the source.
+- `language_family_root`: A four-character abbreviation for the language family or non-cladistic category, out of a set of 107.
+- `language_family_genus`: The name of the language genus; e.g. Romance, Munda, Semitic, Samoyedic.
+- `country`: The country in which the language is spoken. Territorially disjunct autonomous constituents (e.g. New Caledonia, Greenland, Guam) are treated as their own countries, but territorially disjunct regions (e.g. Hawaii, French Guiana, Kaliningrad) are not.
+- `area`: One of the following five values: Africa, America, Asia, Europe, Pacific.
+- `population`: A population estimate for the language.
+- `latitude`, `longitude`: Coordinates for a location in which the language is spoken.
 
 Search terms may be joined by the logical operators `and` and `or`. These are postfix.
